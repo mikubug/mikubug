@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>凌云社 · MikuBug</title>
+<meta name="description" content="凌云社 MikuBug — 探索前沿技术 · 汇聚创造力量" />
+<meta name="theme-color" content="#f2f7fc" />
+<link rel="icon" href="./assets/logo.png" />
+<link rel="preload" href="./assets/logo.png" as="image" />
+<script>
+  /* 首屏防闪烁:在样式生效前就把主题落到 <html> 上(默认浅色) */
+  (function () {
+    try {
+      var v = localStorage.getItem('mikubug.theme');
+      if (v !== 'light' && v !== 'dark') v = 'light';
+      document.documentElement.dataset.theme = v;
+      document.documentElement.style.colorScheme = v;
+    } catch (e) {
+      document.documentElement.dataset.theme = 'light';
+    }
+  })();
+</script>
+</head>
+<body>
+
+<div id="app"></div>
+
+<noscript>
+  <div class="noscript">本站需要启用 JavaScript 才能浏览。</div>
+</noscript>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>

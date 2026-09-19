@@ -1,0 +1,204 @@
+/* ============================================================
+   markdown.css — 渲染后的 Markdown 排版
+   与站点科幻风格统一:克制、层次清晰、代码块有终端感
+   ============================================================ */
+
+.md {
+  color: var(--text-dim);
+  font-size: 15px;
+  line-height: 1.78;
+  word-wrap: break-word;
+}
+
+.md > *:first-child { margin-top: 0; }
+.md > *:last-child { margin-bottom: 0; }
+
+/* 标题 */
+.md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
+  color: var(--text);
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0.01em;
+  scroll-margin-top: calc(var(--nav-h) + 20px);
+}
+
+.md h1 {
+  margin: 34px 0 16px;
+  font-size: 26px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.md h2 {
+  position: relative;
+  margin: 30px 0 14px;
+  padding-left: 14px;
+  font-size: 21px;
+}
+
+/* 标题前的强调竖线 */
+.md h2::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0.24em; bottom: 0.24em;
+  width: 2px;
+  background: var(--accent);
+  box-shadow: 0 0 9px var(--glow);
+  border-radius: 2px;
+}
+
+.md h3 { margin: 25px 0 12px; font-size: 17.5px; color: var(--text); }
+.md h4 { margin: 20px 0 10px; font-size: 15.5px; color: var(--text-dim); }
+.md h5, .md h6 { margin: 18px 0 8px; font-size: 14.5px; color: var(--text-dim); }
+
+/* 段落与行内 */
+.md p { margin: 13px 0; }
+
+.md strong { color: var(--text); font-weight: 600; }
+.md em { color: var(--text-dim); }
+
+.md a {
+  color: var(--accent-ink);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.4);
+  transition: color 0.25s var(--ease), border-color 0.25s var(--ease),
+              background-color 0.25s var(--ease);
+}
+
+.md a:hover {
+  color: var(--accent-bright);
+  border-bottom-color: var(--accent-bright);
+  background: var(--accent-soft);
+}
+
+.md del { color: var(--text-faint); }
+
+.md mark {
+  background: var(--accent-soft);
+  color: var(--text);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+
+/* 行内代码 */
+.md code {
+  font-family: var(--mono);
+  font-size: 0.875em;
+  padding: 2px 6px;
+  border-radius: 5px;
+  background: var(--hairline);
+  border: 1px solid var(--border);
+  color: var(--accent-bright);
+  white-space: nowrap;
+}
+
+/* 代码块:终端窗口质感 */
+.md pre {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--pre-bg);
+  overflow-x: auto;
+  position: relative;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* 顶部三个"窗口灯" */
+.md pre::before {
+  content: '';
+  position: absolute;
+  top: 11px; left: 14px;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: rgba(148, 163, 184, 0.28);
+  box-shadow: 14px 0 0 rgba(148, 163, 184, 0.18),
+              28px 0 0 rgba(148, 163, 184, 0.11);
+}
+
+.md pre code {
+  display: block;
+  padding: 14px 0 0;
+  background: none;
+  border: 0;
+  color: var(--text-dim);
+  font-size: 13px;
+  line-height: 1.7;
+  white-space: pre;
+}
+
+/* 引用 */
+.md blockquote {
+  margin: 16px 0;
+  padding: 12px 18px;
+  border-left: 2px solid var(--accent);
+  border-radius: 0 8px 8px 0;
+  background: var(--accent-soft);
+  color: var(--text-dim);
+}
+
+.md blockquote p { margin: 6px 0; }
+
+/* 列表 */
+.md ul, .md ol { margin: 13px 0; padding-left: 24px; }
+.md li { margin: 6px 0; }
+.md li::marker { color: var(--accent); opacity: 0.85; }
+.md ul ul, .md ol ol, .md ul ol, .md ol ul { margin: 6px 0; }
+
+.md li.task { list-style: none; margin-left: -20px; }
+.md li.task input {
+  margin-right: 8px;
+  accent-color: var(--accent);
+  vertical-align: -1px;
+}
+
+/* 表格 */
+.md-table {
+  margin: 18px 0;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.md table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  min-width: 380px;
+}
+
+.md th {
+  padding: 11px 15px;
+  background: var(--hairline);
+  color: var(--text);
+  font-weight: 600;
+  text-align: left;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+
+.md td {
+  padding: 10px 15px;
+  border-top: 1px solid var(--hairline);
+}
+
+.md tbody tr { transition: background-color 0.25s var(--ease); }
+.md tbody tr:hover { background: var(--hairline); }
+
+/* 分隔线与图片 */
+.md hr {
+  margin: 26px 0;
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, var(--border-strong), transparent 76%);
+}
+
+.md img {
+  max-width: 100%;
+  height: auto;
+  margin: 14px 0;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  display: block;
+}

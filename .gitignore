@@ -4,3 +4,9 @@ dist/
 *.local
 .DS_Store
 Thumbs.db
+
+# 本地验证产物(截图 / 临时脚本 / Chrome profile)
+screenshots/
+_*.py
+_chromeprofile*/
+_*_shots/

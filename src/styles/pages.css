@@ -158,17 +158,38 @@
 .hero-term {
   position: relative;
   margin-top: 24px;
-  min-height: 1.6em;         /* 固定高度,打字时不抖 */
+  /* 只占一行的高度:光标始终在同一基线上,不会随字数跳动 */
+  height: 1.7em;
+  display: flex;
+  align-items: center;
+  max-width: 34em;
   font-size: 12.5px;
   letter-spacing: 0.06em;
   color: var(--accent-ink);
+  white-space: nowrap;         /* 宁可缩字号也不折行 */
 }
 
+/* 提示符:用 CSS 画,不占文案,打字时宽度恒定 */
+.hero-term::before {
+  content: '>';
+  flex-shrink: 0;
+  margin-right: 0.7em;
+  color: var(--text-faint);
+}
+
+.hero-term-text {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 光标:紧跟文案,留出 2px 真实间隙 */
 .hero-term-caret {
-  display: inline-block;
-  width: 7px; height: 13px;
-  margin-left: 3px;
-  vertical-align: -2px;
+  flex-shrink: 0;
+  width: 0.42em;
+  height: 1.05em;
+  margin-left: 0.22em;
+  border-radius: 1px;
   background: var(--accent);
   box-shadow: 0 0 10px var(--glow);
   animation: caret-blink 1.05s steps(1, end) infinite;
@@ -177,6 +198,11 @@
 @keyframes caret-blink {
   0%, 49%   { opacity: 1; }
   50%, 100% { opacity: 0; }
+}
+
+/* 动效敏感 / 省电:光标不闪,静态显示 */
+@media (prefers-reduced-motion: reduce) {
+  .hero-term-caret { animation: none; opacity: 1; }
 }
 
 /* 右侧雷达扫描盘 */
@@ -944,5 +970,5 @@
   .search { max-width: none; }
   .channel-grid { grid-template-columns: 1fr; }
   .hero-radar { width: 170px; height: 170px; right: -46px; margin-top: -85px; opacity: 0.5; }
-  .hero-term { font-size: 11.5px; margin-top: 20px; }
+  .hero-term { font-size: 11.5px; margin-top: 20px; max-width: none; }
 }

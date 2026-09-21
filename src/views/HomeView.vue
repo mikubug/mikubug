@@ -18,36 +18,55 @@ const ENTRIES = [
 
 /* ---------- 终端打字机:循环「打字 → 停留 → 删除」 ---------- */
 
+/** 每行文案押在短句上:太长会折行,整段删除重打会显得碎 */
 const LINES = [
-  '> 探索前沿技术 · 汇聚创造力量',
-  '> 用代码构建我们想看见的世界',
-  '> 文档已同步 · 随时可以访问',
+  '探索前沿技术 · 汇聚创造力量',
+  '记录每一次尝试与成果',
+  '欢迎加入我们',
+  '看我把你 MikuMiku！',
+  '周南梅溪湖现在唯一 ACG 社！'
 ];
 
 const typed = ref('');
-let line = 0;
-let chars = 0;
-let holds = 0;
+
+let line = 0;      // 当前行
+let chars = 0;     // 已显示字符数
+let phase = 'type'; // type 打字 / hold 停留 / erase 删除
+let holdLeft = 0;  // 停留剩余帧
 let timer = 0;
 
+/** 按当前相位推进一格 */
 const step = () => {
   const text = LINES[line];
-  if (chars < text.length) {
+
+  if (phase === 'type') {
     chars += 1;
     typed.value = text.slice(0, chars);
-    timer = setTimeout(step, 58);
-  } else if (holds < 26) {
-    holds += 1;
-    timer = setTimeout(step, 95);
-  } else if (chars > 0) {
-    chars -= 1;
-    typed.value = text.slice(0, chars);
-    timer = setTimeout(step, 22);
-  } else {
-    holds = 0;
-    line = (line + 1) % LINES.length;
-    timer = setTimeout(step, 240);
+    if (chars >= text.length) {
+      // 打完了先停住,让人读完(约 2.2s),别急着删
+      phase = 'hold';
+      holdLeft = 11;
+    }
+    timer = setTimeout(step, chars === 1 ? 260 : 68); // 首字稍作停顿,像真的在敲
+    return;
   }
+
+  if (phase === 'hold') {
+    if (holdLeft-- > 0) {
+      timer = setTimeout(step, 200);
+    } else {
+      phase = 'erase';
+      timer = setTimeout(step, 120);
+    }
+    return;
+  }
+
+  // erase:整段清掉再换行,不做逐字回删(慢且晃眼)
+  typed.value = '';
+  phase = 'type';
+  line = (line + 1) % LINES.length;
+  chars = 0;
+  timer = setTimeout(step, 380);
 };
 
 /* ---------- 主视觉视差:装饰层随指针轻微偏移 ---------- */
@@ -82,7 +101,7 @@ onMounted(() => {
   if (still) {
     typed.value = LINES[0];
   } else {
-    timer = setTimeout(step, 420);
+    timer = setTimeout(step, 620);
   }
 
   // 只有带指针的设备才做视差,触屏省电
@@ -120,7 +139,7 @@ onBeforeUnmount(() => {
         </h1>
         <p v-reveal="250" class="hero-sub">{{ SITE.tagline }}</p>
 
-        <!-- 终端打字机 -->
+        <!-- 终端打字机: > 是 CSS 画的提示符,光标跟在文案后面 -->
         <p v-reveal="330" class="hero-term mono">
           <span class="hero-term-text">{{ typed }}</span>
           <span class="hero-term-caret" aria-hidden="true"></span>

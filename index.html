@@ -6,10 +6,10 @@
 <title>凌云社 · MikuBug</title>
 <meta name="description" content="凌云社 MikuBug — 探索前沿技术 · 汇聚创造力量" />
 <meta name="theme-color" content="#f2f7fc" />
-<link rel="icon" href="./assets/logo.png" />
-<link rel="preload" href="./assets/logo.png" as="image" />
+<link rel="icon" href="%BASE_URL%assets/logo.png" />
+<link rel="preload" href="%BASE_URL%assets/logo.png" as="image" />
 <script>
-  /* 首屏防闪烁:在样式生效前就把主题落到 <html> 上(默认浅色) */
+  /* 1) 主题:在样式生效前落到 <html>,避免首屏闪色(默认浅色) */
   (function () {
     try {
       var v = localStorage.getItem('mikubug.theme');
@@ -19,6 +19,27 @@
     } catch (e) {
       document.documentElement.dataset.theme = 'light';
     }
+  })();
+
+  /* 2) history 路由:
+        a. 兼容旧版 hash 链接 —— /#/works/xxx 自动换成 /works/xxx
+        b. 从 404 回退页(404.html)跳回来时还原真实地址。
+        都必须早于 Vue 挂载,否则会先渲染首页。 */
+  (function () {
+    try {
+      if (location.hash.indexOf('#/') === 0) {
+        history.replaceState(null, '', location.pathname.replace(/\/[^/]*$/, '/') + location.hash.slice(2));
+      }
+    } catch (e) { /* 忽略 */ }
+
+    try {
+      var to = sessionStorage.getItem('mikubug.redirect');
+      if (!to) return;
+      sessionStorage.removeItem('mikubug.redirect');
+      if (to !== location.pathname + location.search + location.hash) {
+        history.replaceState(null, '', to);
+      }
+    } catch (e) { /* 忽略 */ }
   })();
 </script>
 </head>

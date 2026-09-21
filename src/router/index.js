@@ -1,9 +1,11 @@
 /* ============================================================
-   路由表 —— hash 模式
-   纯静态部署无需服务器 rewrite,任何静态托管都能直接用。
+   路由表 —— history 模式(真路由)
+   地址栏是 /works/xxx 这样的真路径,没有 #。
+   代价:静态托管需要把未知路径回退到 index.html,
+   本项目已内置 public/404.html 兜底(GitHub Pages 等纯静态也能跑)。
    ============================================================ */
 
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 
 import HomeView from '../views/HomeView.vue';
 import NoticeView from '../views/NoticeView.vue';
@@ -12,6 +14,9 @@ import WorkDetailView from '../views/WorkDetailView.vue';
 import AboutView from '../views/AboutView.vue';
 import JoinView from '../views/JoinView.vue';
 import NotFoundView from '../views/NotFoundView.vue';
+
+/* base 与 Vite 的 base 保持一致:默认站点根,子路径部署时用 VITE_BASE 覆盖 */
+const BASE = import.meta.env.BASE_URL || '/';
 
 const routes = [
   { path: '/', name: 'home', component: HomeView },
@@ -24,7 +29,7 @@ const routes = [
 ];
 
 export default createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(BASE),
   routes,
-  scrollBehavior: () => ({ top: 0 }),
+  scrollBehavior: (to, from, saved) => saved || { top: 0 },
 });

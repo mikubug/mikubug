@@ -1,16 +1,42 @@
+import { readFile, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 
-export default defineConfig({
-  /**
-   * 相对基础路径:
-   *  - 可部署到任意子目录(如 GitHub Pages 的 /mikubug-site/)
-   *  - 也可直接用 `npm run preview` 在本地打开
-   * 所有资源引用都走 import.meta.env.BASE_URL,不要写死 '/'。
-   */
-  base: './',
+/**
+ * history 路由要求资源走绝对路径:
+ * 深层地址(/works/xxx)下相对路径会解析成 /works/assets/... 而 404。
+ * 默认部署在站点根(GitHub Pages 的 mikubug.github.io);子路径部署用 VITE_BASE 覆盖,例如
+ *   VITE_BASE=/site/ npm run build
+ */
+const base = process.env.VITE_BASE || '/';
 
-  plugins: [vue()],
+/**
+ * 把 public/404.html 里的 __BASE__ 换成真实 base。
+ * 那份 404.html 是纯静态托管的 SPA 回退:服务器找不到路径时返回它,
+ * 它把目标路径存进 sessionStorage 再跳回入口,由 index.html 还原。
+ */
+function spaFallback() {
+  let outDir = 'dist';
+
+  return {
+    name: 'mikubug-spa-fallback',
+    apply: 'build',
+    configResolved(cfg) {
+      outDir = cfg.build.outDir;
+    },
+    async closeBundle() {
+      const file = resolve(outDir, '404.html');
+      const html = await readFile(file, 'utf8');
+      await writeFile(file, html.replace(/__BASE__/g, base), 'utf8');
+    },
+  };
+}
+
+export default defineConfig({
+  base,
+  plugins: [vue(), spaFallback()],
 
   server: { port: 5173, open: false },
 

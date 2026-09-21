@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>凌云社 · MikuBug</title>
+<script>
+  /*
+   * 纯静态托管的 SPA 回退(history 路由用)。
+   * 服务器遇到不存在的路径会返回本页,这里把目标地址暂存,再回到入口;
+   * 入口(index.html)读回并 replaceState,于是刷新 /works/xxx 也能直接命中。
+   * __BASE__ 由构建脚本替换成实际 base。
+   */
+  (function () {
+    var target = location.pathname + location.search + location.hash;
+    try {
+      sessionStorage.setItem('mikubug.redirect', target);
+    } catch (e) { /* 隐私模式下忽略 */ }
+    location.replace('__BASE__');
+  })();
+</script>
+</head>
+<body></body>
+</html>

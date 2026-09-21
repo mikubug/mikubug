@@ -4,11 +4,18 @@
    强调文字用 --accent-ink(浅底上更深),色块/边框/发光用 --accent
    ============================================================ */
 
-/* ---------- 首页:主视觉 ---------- */
+/* ---------- 首页:主视觉(HUD 仪表盘) ---------- */
 
 .hero {
+  /* 指针视差:装饰层按各自系数读取(见 .hud-ruler / .hero-radar) */
+  --px: 0px;
+  --py: 0px;
   position: relative;
-  padding: 60px 48px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;        /* 内容垂直居中,配合 min-height 上下留白对称 */
+  padding: 62px 48px;
+  min-height: 320px;              /* 让右侧雷达有完整落位空间 */
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: var(--hero-bg);
@@ -45,6 +52,24 @@
   pointer-events: none;
 }
 
+/* ---------- HUD:顶部刻度尺 ---------- */
+
+.hud-ruler {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 15px;
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(var(--accent-rgb), 0.5) 0 1px,
+    transparent 1px 20px
+  );
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 14%, #000 86%, transparent);
+  opacity: 0.62;
+  transform: translate3d(calc(var(--px) * 0.35), 0, 0);
+  pointer-events: none;
+}
+
 .hero-title {
   position: relative;
   margin-top: 18px;
@@ -72,6 +97,39 @@
   to   { background-position: 100% 50%; }
 }
 
+/* 故障闪:每 7.6s 抖一下色差,其余时间完全静止(不打扰阅读) */
+.hero-title::before,
+.hero-title::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: none;
+  -webkit-text-fill-color: currentColor;
+  opacity: 0;
+  pointer-events: none;
+  animation: glitch-flash 7.6s steps(1, end) 1.8s infinite;
+}
+
+.hero-title::before {
+  color: var(--accent);
+  transform: translate(2px, -1px);
+  animation-delay: 1.8s;
+}
+
+.hero-title::after {
+  color: var(--accent-2);
+  transform: translate(-2px, 1px);
+  animation-delay: 1.94s;
+}
+
+@keyframes glitch-flash {
+  0%, 88%, 100% { opacity: 0; }
+  89%    { opacity: 0.7; }
+  90.5%  { opacity: 0; }
+  92%    { opacity: 0.45; }
+  93.5%  { opacity: 0; }
+}
+
 .hero-title .dot {
   -webkit-text-fill-color: var(--accent);
   color: var(--accent);
@@ -95,51 +153,107 @@
   animation: hero-in 1.15s var(--ease) 0.38s both;
 }
 
-/* 右侧轨道装饰 */
-.hero-orbit {
-  position: absolute;
-  width: 280px; height: 280px;
-  right: 7%; top: 50%;
-  transform: translateY(-50%);
-  border: 1px solid rgba(var(--accent-rgb), 0.2);
-  border-radius: 50%;
-  transition: border-color 0.6s var(--ease);
-}
-.hero-orbit::before,
-.hero-orbit::after {
-  content: '';
-  position: absolute;
-  inset: 24px;
-  border: 1px solid rgba(var(--accent-rgb), 0.18);
-  border-radius: 50%;
-}
-.hero-orbit::after {
-  inset: 58px;
-  border-style: dashed;
-  animation: orbit-spin 18s linear infinite;
-}
-.hero-orbit span {
-  position: absolute;
-  width: 9px; height: 9px;
-  right: 28px; top: 44px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 7px rgba(var(--accent-rgb), 0.13), 0 0 22px var(--glow);
-  animation: orbit-dot 3.6s var(--ease-io) infinite;
-}
-.hero-orbit i {
-  position: absolute;
-  inset: 50%;
-  width: 5px; height: 5px;
-  border-radius: 50%;
-  background: var(--accent-2);
-  box-shadow: 0 0 18px rgba(79, 140, 255, 0.7);
+/* ---------- HUD:终端打字机 ---------- */
+
+.hero-term {
+  position: relative;
+  margin-top: 24px;
+  min-height: 1.6em;         /* 固定高度,打字时不抖 */
+  font-size: 12.5px;
+  letter-spacing: 0.06em;
+  color: var(--accent-ink);
 }
 
-@keyframes orbit-spin { to { transform: rotate(360deg); } }
-@keyframes orbit-dot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50%      { transform: scale(1.35); opacity: 0.75; }
+.hero-term-caret {
+  display: inline-block;
+  width: 7px; height: 13px;
+  margin-left: 3px;
+  vertical-align: -2px;
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--glow);
+  animation: caret-blink 1.05s steps(1, end) infinite;
+}
+
+@keyframes caret-blink {
+  0%, 49%   { opacity: 1; }
+  50%, 100% { opacity: 0; }
+}
+
+/* 右侧雷达扫描盘 */
+.hero-radar {
+  position: absolute;
+  width: 292px; height: 292px;
+  right: 5%;
+  top: 50%;
+  margin-top: -146px;                /* 替代 translateY(-50%),把 transform 留给视差 */
+  border: 1px solid rgba(var(--accent-rgb), 0.2);
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.9;
+  transform: translate3d(calc(var(--px) * 0.8), calc(var(--py) * 0.8), 0);
+  pointer-events: none;
+}
+
+/* 内圈 */
+.radar-ring {
+  position: absolute;
+  inset: 30px;
+  border: 1px solid rgba(var(--accent-rgb), 0.16);
+  border-radius: 50%;
+}
+
+/* 十字准线 */
+.radar-cross {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgba(var(--accent-rgb), 0.15), rgba(var(--accent-rgb), 0.15)) 50% 0 / 1px 100% no-repeat,
+    linear-gradient(rgba(var(--accent-rgb), 0.15), rgba(var(--accent-rgb), 0.15)) 0 50% / 100% 1px no-repeat;
+}
+
+/* 扫描扇形 */
+.radar-sweep {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(var(--accent-rgb), 0.34) 0deg,
+    rgba(var(--accent-rgb), 0.10) 46deg,
+    transparent 76deg,
+    transparent 360deg
+  );
+  animation: radar-spin 4.8s linear infinite;
+}
+
+@keyframes radar-spin { to { transform: rotate(360deg); } }
+
+/* 目标点 */
+.radar-blip {
+  position: absolute;
+  left: 62%; top: 30%;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 5px rgba(var(--accent-rgb), 0.14), 0 0 16px var(--glow);
+  animation: blip 3.4s var(--ease-io) infinite;
+}
+
+@keyframes blip {
+  0%, 100% { opacity: 0.35; transform: scale(0.8); }
+  30%      { opacity: 1; transform: scale(1.15); }
+  60%      { opacity: 0.5; transform: scale(0.9); }
+}
+
+/* 圆心 */
+.radar-core {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 6px; height: 6px;
+  margin: -3px 0 0 -3px;
+  border-radius: 50%;
+  background: var(--accent-2);
+  box-shadow: 0 0 16px rgba(79, 140, 255, 0.7);
 }
 
 /* ---------- 首页:入口卡片 ---------- */
@@ -163,6 +277,23 @@
   overflow: hidden;
   transition: border-color 0.45s var(--ease), background-color 0.45s var(--ease),
               transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+}
+
+/* 右上角标:常驻弱显示,悬停点亮 */
+.entry-corner {
+  position: absolute;
+  top: 0; right: 0;
+  width: 24px; height: 24px;
+  border-top: 1.5px solid rgba(var(--accent-rgb), 0.34);
+  border-right: 1.5px solid rgba(var(--accent-rgb), 0.34);
+  border-top-right-radius: var(--radius);
+  transition: border-color 0.45s var(--ease), box-shadow 0.45s var(--ease);
+  pointer-events: none;
+}
+
+.entry:hover .entry-corner {
+  border-color: var(--accent);
+  box-shadow: 3px -3px 14px -4px var(--glow);
 }
 
 /* 悬停时从左扫过的光带 */
@@ -812,5 +943,6 @@
   .toolbar { gap: 10px; }
   .search { max-width: none; }
   .channel-grid { grid-template-columns: 1fr; }
-  .hero-orbit { width: 150px; height: 150px; right: -32px; opacity: 0.55; }
+  .hero-radar { width: 170px; height: 170px; right: -46px; margin-top: -85px; opacity: 0.5; }
+  .hero-term { font-size: 11.5px; margin-top: 20px; }
 }

@@ -1,0 +1,3 @@
+# history 路由的服务器回退规则
+# Cloudflare Pages / Netlify 会读取本文件:任意路径都交给入口,由前端路由接管
+/*    /index.html   200

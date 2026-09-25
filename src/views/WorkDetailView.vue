@@ -1,12 +1,9 @@
 <script setup>
-/**
- * 成果详情 —— 渲染完整 Markdown
- * 文档已随包编译,无需请求,切换零延迟。
- */
+/** 成果详情 —— 渲染完整 Markdown（文档随包编译，切换无需请求） */
 import { computed } from 'vue';
 import { useRoute } from 'vue-router';
 import { findDoc } from '../lib/content';
-import { fmtDate } from '../lib/format';
+import { fmtDate, fmtAuthors } from '../lib/format';
 
 import StateBox from '../components/StateBox.vue';
 import TagChips from '../components/TagChips.vue';
@@ -21,6 +18,16 @@ const safeDecode = (s) => {
 
 const fileName = computed(() => String(route.params.file || ''));
 const doc = computed(() => findDoc(fileName.value) || findDoc(safeDecode(fileName.value)));
+
+/** 元信息行:作者(多人写「联合编写」) + 日期 */
+const metaLine = computed(() => {
+  const d = doc.value;
+  if (!d) return '';
+  return [
+    fmtAuthors(d.writer),
+    d.date ? `日期：${fmtDate(d.date)}` : '',
+  ].filter(Boolean).join('   ');
+});
 </script>
 
 <template>
@@ -41,9 +48,7 @@ const doc = computed(() => findDoc(fileName.value) || findDoc(safeDecode(fileNam
           <p v-reveal="40" class="kicker mono">DOCUMENT</p>
           <h1 v-reveal="90" class="doc-h1">{{ doc.title }}</h1>
 
-          <div v-reveal="140" class="doc-metarow mono">
-            {{ [doc.writer ? `writer: ${doc.writer}` : '', doc.date ? `date: ${fmtDate(doc.date)}` : '', `file: ${doc.file}`].filter(Boolean).join('   ') }}
-          </div>
+          <div v-reveal="140" class="doc-metarow mono">{{ metaLine }}</div>
 
           <div v-if="doc.tags.length" v-reveal="180">
             <TagChips :tags="doc.tags" />

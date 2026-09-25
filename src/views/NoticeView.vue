@@ -1,5 +1,5 @@
 <script setup>
-/** 公告页 —— 读取 public/notice.json,支持置顶 / 标签 / Markdown 正文 */
+/** 公告页 —— 读取 public/notice.json5,支持置顶 / 标签 / Markdown 正文 */
 import { onMounted, ref } from 'vue';
 import { loadNotices } from '../lib/content';
 import { relTime } from '../lib/format';
@@ -35,7 +35,7 @@ onMounted(async () => {
         <StateBox
           v-else-if="status === 'error'"
           code="// ERROR"
-          text="公告加载失败,请检查 notice.json"
+          text="公告加载失败"
         />
 
         <StateBox v-else-if="!list.length" code="// EMPTY" text="暂无公告" />

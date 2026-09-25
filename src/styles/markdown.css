@@ -1,11 +1,8 @@
-/* ============================================================
-   markdown.css — 渲染后的 Markdown 排版
-   与站点科幻风格统一:克制、层次清晰、代码块有终端感
-   ============================================================ */
+/* markdown.css — Markdown 渲染结果的排版 */
 
 .md {
-  color: var(--text-dim);
-  font-size: 15px;
+  color: var(--colorNeutralForeground2);
+  font-size: var(--fontSize400);
   line-height: 1.78;
   word-wrap: break-word;
 }
@@ -14,191 +11,187 @@
 .md > *:last-child { margin-bottom: 0; }
 
 /* 标题 */
+
 .md h1, .md h2, .md h3, .md h4, .md h5, .md h6 {
-  color: var(--text);
-  font-weight: 600;
-  line-height: 1.35;
-  letter-spacing: 0.01em;
+  font-family: var(--fontFamilyDisplay);
+  color: var(--colorNeutralForeground1);
+  font-weight: var(--fontWeightSemibold);
+  line-height: 1.32;
+  letter-spacing: -0.005em;
   scroll-margin-top: calc(var(--nav-h) + 20px);
 }
 
 .md h1 {
-  margin: 34px 0 16px;
-  font-size: 26px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border);
+  margin: var(--spacingXXXL) 0 var(--spacingL);
+  font-size: var(--fontSize700);
+  padding-bottom: var(--spacingM);
+  border-bottom: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
 }
 
 .md h2 {
   position: relative;
-  margin: 30px 0 14px;
-  padding-left: 14px;
-  font-size: 21px;
+  margin: var(--spacingXXXL) 0 var(--spacingM);
+  padding-left: var(--spacingL);
+  font-size: var(--fontSize600);
 }
 
-/* 标题前的强调竖线 */
+/* 标题前的品牌竖线 */
 .md h2::before {
   content: '';
   position: absolute;
-  left: 0; top: 0.24em; bottom: 0.24em;
-  width: 2px;
-  background: var(--accent);
-  box-shadow: 0 0 9px var(--glow);
-  border-radius: 2px;
+  left: 0; top: 0.28em; bottom: 0.28em;
+  width: 3px;
+  border-radius: var(--borderRadiusSmall);
+  background: var(--colorCompoundBrandStroke);
 }
 
-.md h3 { margin: 25px 0 12px; font-size: 17.5px; color: var(--text); }
-.md h4 { margin: 20px 0 10px; font-size: 15.5px; color: var(--text-dim); }
-.md h5, .md h6 { margin: 18px 0 8px; font-size: 14.5px; color: var(--text-dim); }
+.md h3 { margin: var(--spacingXXL) 0 var(--spacingM); font-size: var(--fontSize500); }
+.md h4 { margin: var(--spacingXL) 0 var(--spacingS); font-size: var(--fontSize400); color: var(--colorNeutralForeground2); }
+.md h5, .md h6 { margin: var(--spacingL) 0 var(--spacingS); font-size: var(--fontSize300); color: var(--colorNeutralForeground3); }
 
 /* 段落与行内 */
-.md p { margin: 13px 0; }
 
-.md strong { color: var(--text); font-weight: 600; }
-.md em { color: var(--text-dim); }
+.md p { margin: var(--spacingM) 0; }
+
+.md strong { color: var(--colorNeutralForeground1); font-weight: var(--fontWeightSemibold); }
+.md em { color: var(--colorNeutralForeground2); }
 
 .md a {
-  color: var(--accent-ink);
-  border-bottom: 1px solid rgba(var(--accent-rgb), 0.4);
-  transition: color 0.25s var(--ease), border-color 0.25s var(--ease),
-              background-color 0.25s var(--ease);
+  color: var(--colorBrandForegroundLink);
+  border-bottom: var(--strokeWidthThin) solid var(--colorBrandStroke2);
+  transition:
+    color var(--durationFast) var(--curveEasyEase),
+    border-color var(--durationFast) var(--curveEasyEase),
+    background-color var(--durationFast) var(--curveEasyEase);
 }
 
 .md a:hover {
-  color: var(--accent-bright);
-  border-bottom-color: var(--accent-bright);
-  background: var(--accent-soft);
+  color: var(--colorBrandForegroundLinkHover);
+  border-bottom-color: var(--colorBrandStroke1);
+  background: var(--colorBrandBackground2);
 }
 
-.md del { color: var(--text-faint); }
+.md del { color: var(--colorNeutralForeground4); }
 
 .md mark {
-  background: var(--accent-soft);
-  color: var(--text);
-  padding: 1px 4px;
-  border-radius: 3px;
+  background: var(--colorBrandBackground2);
+  color: var(--colorNeutralForeground1);
+  padding: 1px var(--spacingXS);
+  border-radius: var(--borderRadiusSmall);
 }
 
 /* 行内代码 */
+
 .md code {
-  font-family: var(--mono);
+  font-family: var(--fontFamilyMonospace);
   font-size: 0.875em;
-  padding: 2px 6px;
-  border-radius: 5px;
-  background: var(--hairline);
-  border: 1px solid var(--border);
-  color: var(--accent-bright);
+  padding: 2px var(--spacingSNudge);
+  border-radius: var(--borderRadiusMedium);
+  background: var(--colorNeutralBackground3);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  color: var(--colorBrandForeground1);
   white-space: nowrap;
 }
 
-/* 代码块:终端窗口质感 */
-.md pre {
-  margin: 18px 0;
-  padding: 16px 18px;
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--pre-bg);
-  overflow-x: auto;
-  position: relative;
-  -webkit-overflow-scrolling: touch;
-}
+/* 代码块：Fluent Card */
 
-/* 顶部三个"窗口灯" */
-.md pre::before {
-  content: '';
-  position: absolute;
-  top: 11px; left: 14px;
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: rgba(148, 163, 184, 0.28);
-  box-shadow: 14px 0 0 rgba(148, 163, 184, 0.18),
-              28px 0 0 rgba(148, 163, 184, 0.11);
+.md pre {
+  margin: var(--spacingL) 0;
+  padding: var(--spacingL);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusXLarge);
+  background: var(--colorNeutralBackground2);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .md pre code {
   display: block;
-  padding: 14px 0 0;
+  padding: 0;
   background: none;
   border: 0;
-  color: var(--text-dim);
-  font-size: 13px;
+  color: var(--colorNeutralForeground2);
+  font-size: var(--fontSize300);
   line-height: 1.7;
   white-space: pre;
 }
 
 /* 引用 */
+
 .md blockquote {
-  margin: 16px 0;
-  padding: 12px 18px;
-  border-left: 2px solid var(--accent);
-  border-radius: 0 8px 8px 0;
-  background: var(--accent-soft);
-  color: var(--text-dim);
+  margin: var(--spacingL) 0;
+  padding: var(--spacingM) var(--spacingL);
+  border-left: 3px solid var(--colorCompoundBrandStroke);
+  border-radius: 0 var(--borderRadiusXLarge) var(--borderRadiusXLarge) 0;
+  background: var(--colorBrandBackground2);
+  color: var(--colorNeutralForeground2);
 }
 
-.md blockquote p { margin: 6px 0; }
+.md blockquote p { margin: var(--spacingSNudge) 0; }
 
 /* 列表 */
-.md ul, .md ol { margin: 13px 0; padding-left: 24px; }
-.md li { margin: 6px 0; }
-.md li::marker { color: var(--accent); opacity: 0.85; }
-.md ul ul, .md ol ol, .md ul ol, .md ol ul { margin: 6px 0; }
+
+.md ul, .md ol { margin: var(--spacingM) 0; padding-left: var(--spacingXXL); }
+.md li { margin: var(--spacingSNudge) 0; }
+.md li::marker { color: var(--colorBrandStroke1); }
+.md ul ul, .md ol ol, .md ul ol, .md ol ul { margin: var(--spacingSNudge) 0; }
 
 .md li.task { list-style: none; margin-left: -20px; }
 .md li.task input {
-  margin-right: 8px;
-  accent-color: var(--accent);
+  margin-right: var(--spacingS);
+  accent-color: var(--colorBrand60);
   vertical-align: -1px;
 }
 
 /* 表格 */
+
 .md-table {
-  margin: 18px 0;
+  margin: var(--spacingL) 0;
   overflow-x: auto;
-  border: 1px solid var(--border);
-  border-radius: 10px;
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusXLarge);
   -webkit-overflow-scrolling: touch;
 }
 
 .md table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: var(--fontSize300);
   min-width: 380px;
 }
 
 .md th {
-  padding: 11px 15px;
-  background: var(--hairline);
-  color: var(--text);
-  font-weight: 600;
+  padding: var(--spacingM) var(--spacingL);
+  background: var(--colorNeutralBackground3);
+  color: var(--colorNeutralForeground1);
+  font-weight: var(--fontWeightSemibold);
   text-align: left;
-  letter-spacing: 0.03em;
   white-space: nowrap;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
 }
 
 .md td {
-  padding: 10px 15px;
-  border-top: 1px solid var(--hairline);
+  padding: var(--spacingMNudge) var(--spacingL);
+  border-top: var(--strokeWidthThin) solid var(--colorNeutralStroke3);
 }
 
-.md tbody tr { transition: background-color 0.25s var(--ease); }
-.md tbody tr:hover { background: var(--hairline); }
+.md tbody tr { transition: background-color var(--durationFast) var(--curveEasyEase); }
+.md tbody tr:hover { background: var(--colorNeutralBackground2); }
 
 /* 分隔线与图片 */
+
 .md hr {
-  margin: 26px 0;
-  height: 1px;
+  margin: var(--spacingXXL) 0;
+  height: var(--strokeWidthThin);
   border: 0;
-  background: linear-gradient(90deg, var(--border-strong), transparent 76%);
+  background: var(--colorNeutralStroke2);
 }
 
 .md img {
   max-width: 100%;
   height: auto;
-  margin: 14px 0;
-  border-radius: 10px;
-  border: 1px solid var(--border);
+  margin: var(--spacingL) 0;
+  border-radius: var(--borderRadiusXLarge);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
   display: block;
 }

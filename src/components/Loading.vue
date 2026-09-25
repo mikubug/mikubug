@@ -1,8 +1,5 @@
 <script setup>
-/**
- * 加载指示器 —— 沿用 clubweb 原方案:三个脉冲圆点。
- * label 可选,用于补一行等宽小字说明。
- */
+/** 加载指示器 —— 三个脉冲圆点，label 可选（补一行等宽小字） */
 defineProps({
   label: { type: String, default: '' },
 });
@@ -23,32 +20,33 @@ defineProps({
 .loading-wrap {
   display: grid;
   justify-items: center;
-  gap: 14px;
-  padding: 58px 0;
+  gap: var(--spacingL);
+  padding: 56px 0;
 }
 
 .loading {
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: var(--spacingS);
 }
 
 .dot {
   width: 8px;
   height: 8px;
-  border-radius: 50%;
-  background: var(--accent);
-  animation: dot-pulse 1.2s infinite ease-in-out;
+  border-radius: var(--borderRadiusCircular);
+  background: var(--colorBrand60);
+  animation: dot-pulse 1.2s var(--curveEasyEase) infinite;
 }
 
 .dot:nth-child(2) { animation-delay: 0.15s; }
 .dot:nth-child(3) { animation-delay: 0.3s; }
 
 .loading-label {
-  font-size: 11px;
-  letter-spacing: 0.3em;
-  color: var(--text-faint);
-  text-indent: 0.3em;
+  font-family: var(--fontFamilyMonospace);
+  font-size: var(--fontSize200);
+  letter-spacing: 0.22em;
+  color: var(--colorNeutralForeground4);
+  text-indent: 0.22em;
 }
 
 @keyframes dot-pulse {

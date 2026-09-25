@@ -9,10 +9,10 @@ export const SITE = {
   logo: import.meta.env.BASE_URL + 'assets/logo.png',
 };
 
-/** 主导航(首页不在导航里,由左上角 Logo 承载) */
+/** 主导航（首页不在导航里，由左上角 Logo 承载） */
 export const NAV = [
-  { path: '/notice', label: '公告' },
-  { path: '/works', label: '成果' },
-  { path: '/about', label: '关于' },
-  { path: '/join', label: '加入' },
+  { path: '/notice', label: '公告', en: 'NOTICE' },
+  { path: '/works', label: '成果', en: 'WORKS' },
+  { path: '/about', label: '关于', en: 'ABOUT' },
+  { path: '/join', label: '加入', en: 'JOIN' },
 ];

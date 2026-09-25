@@ -1,11 +1,8 @@
 <script setup>
-/**
- * 成果页 —— 列出 ./repo/ 下的全部 Markdown 文档
- * 文档列表在构建期由 import.meta.glob 扫描得到,无需任何清单文件。
- */
+/** 成果页 —— 列出 repo/ 下的全部 Markdown 文档（构建期扫描，无需清单文件） */
 import { computed, ref } from 'vue';
 import { DOCS, ALL_TAGS } from '../lib/content';
-import { fmtDate } from '../lib/format';
+import { fmtDate, fmtAuthors } from '../lib/format';
 
 import PageHead from '../components/PageHead.vue';
 import StateBox from '../components/StateBox.vue';
@@ -71,7 +68,7 @@ const toggleTag = (t) => {
 
       <!-- 文档列表 -->
       <div class="doc-grid">
-        <StateBox v-if="!DOCS.length" code="// EMPTY" text="暂无成果文档 — 在 ./repo/ 放入 .md 文件即可" />
+        <StateBox v-if="!DOCS.length" code="// EMPTY" text="暂无成果文档" />
         <StateBox v-else-if="!shown.length" code="// NO MATCH" text="没有符合条件的文档" />
 
         <template v-else>
@@ -90,7 +87,7 @@ const toggleTag = (t) => {
             <h3 class="doc-title">{{ d.title }}</h3>
 
             <div class="doc-meta mono">
-              {{ [d.writer ? '@' + d.writer : '', d.date ? fmtDate(d.date) : ''].filter(Boolean).join(' · ') || '—' }}
+              {{ [fmtAuthors(d.writer), d.date ? fmtDate(d.date) : ''].filter(Boolean).join(' · ') || '—' }}
             </div>
 
             <!-- 前 100 字符的 Markdown 渲染摘要 -->

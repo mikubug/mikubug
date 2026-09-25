@@ -1,0 +1,389 @@
+/* tokens.css — Fluent 2 设计令牌层（https://fluent2.microsoft.design）
+   字体 / 字号 / 圆角 / 描边 / 间距 / 动效 / 颜色 / 阴影 全在这层；
+   组件样式只引用令牌，不写死颜色与时长。换主题色只改下面的品牌色阶。 */
+
+:root {
+  color-scheme: light;
+
+  /* 字体族：中文走微软雅黑，西文走等宽控制台字体。
+     拉丁字体放栈首，中文字符在它里找不到字形，会自动落到雅黑 */
+  --fontFamilyBase:
+    'Cascadia Mono', Consolas, 'Microsoft YaHei UI', 'Microsoft YaHei',
+    system-ui, sans-serif;
+  --fontFamilyDisplay:
+    'Cascadia Mono', Consolas, 'Microsoft YaHei UI', 'Microsoft YaHei',
+    system-ui, sans-serif;
+  --fontFamilyMonospace:
+    'Cascadia Mono', Consolas, 'SFMono-Regular', ui-monospace, monospace;
+
+  /* 字号 / 行高（Fluent 2 type ramp） */
+  --fontSize100: 10px;  --lineHeight100: 14px;
+  --fontSize200: 12px;  --lineHeight200: 16px;
+  --fontSize300: 14px;  --lineHeight300: 20px;
+  --fontSize400: 16px;  --lineHeight400: 22px;
+  --fontSize500: 20px;  --lineHeight500: 28px;
+  --fontSize600: 24px;  --lineHeight600: 32px;
+  --fontSize700: 28px;  --lineHeight700: 36px;
+  --fontSize800: 32px;  --lineHeight800: 40px;
+  --fontSize900: 40px;  --lineHeight900: 52px;
+  --fontSize1000: 68px; --lineHeight1000: 92px;
+
+  /* 字重 */
+  --fontWeightRegular: 400;
+  --fontWeightMedium: 500;
+  --fontWeightSemibold: 600;
+  --fontWeightBold: 700;
+
+  /* 圆角 */
+  --borderRadiusNone: 0;
+  --borderRadiusSmall: 2px;
+  --borderRadiusMedium: 4px;
+  --borderRadiusLarge: 6px;
+  --borderRadiusXLarge: 8px;
+  --borderRadius2XLarge: 12px;
+  --borderRadiusCircular: 10000px;
+
+  /* 描边 */
+  --strokeWidthThin: 1px;
+  --strokeWidthThick: 2px;
+
+  /* 间距（4px 基准） */
+  --spacingXXS: 2px;
+  --spacingXS: 4px;
+  --spacingSNudge: 6px;
+  --spacingS: 8px;
+  --spacingMNudge: 10px;
+  --spacingM: 12px;
+  --spacingL: 16px;
+  --spacingXL: 20px;
+  --spacingXXL: 24px;
+  --spacingXXXL: 32px;
+
+  /* 动效时长 */
+  --durationUltraFast: 50ms;
+  --durationFaster: 100ms;
+  --durationFast: 150ms;
+  --durationNormal: 200ms;
+  --durationGentle: 250ms;
+  --durationSlow: 300ms;
+  --durationSlower: 400ms;
+  --durationUltraSlow: 500ms;
+
+  /* 动效曲线 */
+  --curveAccelerateMax: cubic-bezier(0.9, 0.1, 1, 0.2);
+  --curveAccelerateMid: cubic-bezier(1, 0, 1, 1);
+  --curveDecelerateMax: cubic-bezier(0.1, 0.9, 0.2, 1);
+  --curveDecelerateMid: cubic-bezier(0, 0, 0, 1);
+  --curveEasyEase: cubic-bezier(0.33, 0, 0.67, 1);
+  --curveEasyEaseMax: cubic-bezier(0.8, 0, 0.2, 1);
+  --curveLinear: cubic-bezier(0, 0, 1, 1);
+
+  /* 品牌色阶（由 66CCFF 生成，10 最浅、160 最深，60 为基准）
+     66CCFF 偏亮：浅底上的品牌文字用 colorBrand110（≥5.7:1），
+     品牌色块上的文字用 colorBrand160（≈10:1），色块/描边/发光才用 colorBrand60 */
+  --colorBrand10: #f0faff;
+  --colorBrand20: #d9f2ff;
+  --colorBrand30: #b8e6ff;
+  --colorBrand40: #99dcff;
+  --colorBrand50: #80d6ff;
+  --colorBrand60: #66ccff;   /* 品牌基准 */
+  --colorBrand70: #47bdfa;
+  --colorBrand80: #1faef9;
+  --colorBrand90: #0997e1;
+  --colorBrand100: #087dba;
+  --colorBrand110: #066698;
+  --colorBrand120: #05527a;
+  --colorBrand130: #043e5d;
+  --colorBrand140: #032e45;
+  --colorBrand150: #022131;
+  --colorBrand160: #01141d;
+
+  /* 品牌语义令牌（浅色主题） */
+  --colorBrandBackground: var(--colorBrand60);
+  --colorBrandBackgroundHover: var(--colorBrand50);
+  --colorBrandBackgroundPressed: var(--colorBrand70);
+  --colorBrandBackgroundSelected: var(--colorBrand60);
+  --colorBrandBackground2: var(--colorBrand10);
+  --colorBrandBackground2Hover: var(--colorBrand20);
+  --colorBrandBackground2Pressed: var(--colorBrand30);
+  --colorBrandBackgroundStatic: var(--colorBrand60);
+  --colorBrandForeground1: var(--colorBrand110);
+  --colorBrandForeground2: var(--colorBrand120);
+  --colorBrandForeground2Hover: var(--colorBrand130);
+  --colorBrandForegroundLink: var(--colorBrand110);
+  --colorBrandForegroundLinkHover: var(--colorBrand130);
+  --colorBrandForegroundLinkPressed: var(--colorBrand130);
+  --colorBrandForegroundOnLight: var(--colorBrand110);
+  --colorBrandStroke1: var(--colorBrand80);
+  --colorBrandStroke2: var(--colorBrand30);
+  --colorBrandStroke2Contrast: var(--colorBrand20);
+  --colorCompoundBrandBackground: var(--colorBrand60);
+  --colorCompoundBrandBackgroundHover: var(--colorBrand50);
+  --colorCompoundBrandBackgroundPressed: var(--colorBrand70);
+  --colorCompoundBrandStroke: var(--colorBrand70);
+  --colorCompoundBrandStrokeHover: var(--colorBrand60);
+  --colorCompoundBrandStrokePressed: var(--colorBrand80);
+
+  /* 中性色（Fluent 2 web light theme） */
+  --colorNeutralForeground1: #242424;
+  --colorNeutralForeground1Hover: #242424;
+  --colorNeutralForeground1Pressed: #242424;
+  --colorNeutralForeground1Selected: #242424;
+  --colorNeutralForeground2: #424242;
+  --colorNeutralForeground2Hover: #242424;
+  --colorNeutralForeground2Pressed: #242424;
+  --colorNeutralForeground2Selected: #242424;
+  --colorNeutralForeground2BrandHover: var(--colorBrand110);
+  --colorNeutralForeground2BrandPressed: var(--colorBrand120);
+  --colorNeutralForeground2BrandSelected: var(--colorBrand110);
+  --colorNeutralForeground3: #616161;
+  --colorNeutralForeground3Hover: #424242;
+  --colorNeutralForeground3Pressed: #424242;
+  --colorNeutralForeground3Selected: #424242;
+  --colorNeutralForeground3BrandHover: var(--colorBrand110);
+  --colorNeutralForeground3BrandPressed: var(--colorBrand120);
+  --colorNeutralForeground3BrandSelected: var(--colorBrand110);
+  --colorNeutralForeground4: #707070;
+  --colorNeutralForegroundDisabled: #bdbdbd;
+  --colorNeutralForegroundInverted: #ffffff;
+  --colorNeutralForegroundInvertedHover: #ffffff;
+  --colorNeutralForegroundInvertedPressed: #ffffff;
+  --colorNeutralForegroundInvertedSelected: #ffffff;
+  --colorNeutralForegroundOnBrand: var(--colorBrand160);
+  --colorNeutralForegroundInvertedLink: #ffffff;
+  --colorNeutralForegroundInvertedLinkHover: #ffffff;
+  --colorNeutralForegroundStaticInverted: #ffffff;
+
+  --colorNeutralBackground1: #ffffff;
+  --colorNeutralBackground1Hover: #f5f5f5;
+  --colorNeutralBackground1Pressed: #e0e0e0;
+  --colorNeutralBackground1Selected: #ebebeb;
+  --colorNeutralBackground2: #fafafa;
+  --colorNeutralBackground2Hover: #f0f0f0;
+  --colorNeutralBackground2Pressed: #dbdbdb;
+  --colorNeutralBackground2Selected: #e6e6e6;
+  --colorNeutralBackground3: #f5f5f5;
+  --colorNeutralBackground3Hover: #ebebeb;
+  --colorNeutralBackground3Pressed: #d6d6d6;
+  --colorNeutralBackground3Selected: #e0e0e0;
+  --colorNeutralBackground4: #f0f0f0;
+  --colorNeutralBackground4Hover: #fafafa;
+  --colorNeutralBackground4Pressed: #f5f5f5;
+  --colorNeutralBackground4Selected: #ffffff;
+  --colorNeutralBackground5: #ebebeb;
+  --colorNeutralBackground6: #e6e6e6;
+  --colorNeutralBackgroundInverted: #292929;
+  --colorNeutralBackgroundStatic: #333333;
+  --colorNeutralBackgroundAlpha: rgba(255, 255, 255, 0.5);
+  --colorNeutralBackgroundAlpha2: rgba(255, 255, 255, 0.8);
+  --colorSubtleBackground: transparent;
+  --colorSubtleBackgroundHover: #f5f5f5;
+  --colorSubtleBackgroundPressed: #e0e0e0;
+  --colorSubtleBackgroundSelected: #ebebeb;
+
+  --colorNeutralStroke1: #d1d1d1;
+  --colorNeutralStroke1Hover: #c7c7c7;
+  --colorNeutralStroke1Pressed: #b3b3b3;
+  --colorNeutralStroke1Selected: #bdbdbd;
+  --colorNeutralStroke2: #e0e0e0;
+  --colorNeutralStroke3: #f0f0f0;
+  --colorNeutralStrokeSubtle: #e0e0e0;
+  --colorNeutralStrokeAccessible: #616161;
+  --colorNeutralStrokeAccessibleHover: #575757;
+  --colorNeutralStrokeAccessiblePressed: #4d4d4d;
+  --colorNeutralStrokeAccessibleSelected: var(--colorBrand110);
+  --colorNeutralStrokeDisabled: #e0e0e0;
+  --colorNeutralStrokeAlpha: rgba(0, 0, 0, 0.05);
+  --colorNeutralStrokeAlpha2: rgba(255, 255, 255, 0.2);
+  --colorTransparentStroke: transparent;
+  --colorTransparentStrokeInteractive: transparent;
+  --colorTransparentStrokeDisabled: transparent;
+
+  --colorNeutralShadowAmbientLighter: rgba(0, 0, 0, 0.06);
+  --colorNeutralShadowKeyLighter: rgba(0, 0, 0, 0.07);
+  --colorNeutralShadowAmbient: rgba(0, 0, 0, 0.12);
+  --colorNeutralShadowKey: rgba(0, 0, 0, 0.14);
+  --colorNeutralShadowAmbientDarker: rgba(0, 0, 0, 0.2);
+  --colorNeutralShadowKeyDarker: rgba(0, 0, 0, 0.24);
+
+  --colorNeutralStencil1: #e6e6e6;
+  --colorNeutralStencil2: #fafafa;
+
+  /* 状态色（Fluent 2 status） */
+  --colorStatusDangerBackground1: #fdf3f4;
+  --colorStatusDangerForeground1: #b10e1c;
+  --colorStatusDangerForeground3: #c50f1f;
+  --colorStatusDangerBorder1: #eeacb2;
+  --colorStatusSuccessBackground1: #f1faf1;
+  --colorStatusSuccessForeground1: #0e700e;
+  --colorStatusSuccessBorder1: #9fd89f;
+  --colorStatusWarningBackground1: #fff9f5;
+  --colorStatusWarningForeground1: #bc4b09;
+  --colorStatusWarningBorder1: #fdcfb4;
+
+  /* 焦点环（Fluent 2 双色焦点） */
+  --colorStrokeFocus1: #ffffff;
+  --colorStrokeFocus2: #000000;
+
+  /* 阴影（Fluent 2 elevation） */
+  --shadow2: 0 1px 2px var(--colorNeutralShadowKey), 0 0 2px var(--colorNeutralShadowAmbient);
+  --shadow4: 0 2px 4px var(--colorNeutralShadowKey), 0 0 2px var(--colorNeutralShadowAmbient);
+  --shadow8: 0 4px 8px var(--colorNeutralShadowKey), 0 0 2px var(--colorNeutralShadowAmbient);
+  --shadow16: 0 8px 16px var(--colorNeutralShadowKey), 0 0 2px var(--colorNeutralShadowAmbient);
+  --shadow28: 0 14px 28px var(--colorNeutralShadowKeyDarker), 0 0 8px var(--colorNeutralShadowAmbientDarker);
+  --shadow64: 0 32px 64px var(--colorNeutralShadowKeyDarker), 0 0 8px var(--colorNeutralShadowAmbientDarker);
+  --shadow2Brand: 0 1px 2px rgba(102, 204, 255, 0.3), 0 0 2px rgba(102, 204, 255, 0.25);
+  --shadow4Brand: 0 2px 4px rgba(102, 204, 255, 0.3), 0 0 2px rgba(102, 204, 255, 0.25);
+  --shadow8Brand: 0 4px 8px rgba(102, 204, 255, 0.3), 0 0 2px rgba(102, 204, 255, 0.25);
+  --shadow16Brand: 0 8px 16px rgba(102, 204, 255, 0.28), 0 0 2px rgba(102, 204, 255, 0.24);
+
+  /* 材质：Mica / Acrylic（Fluent 2 materials） */
+  --colorBackgroundAcrylic: rgba(252, 252, 252, 0.85);
+  --colorBackgroundAcrylic2: rgba(255, 255, 255, 0.72);
+  --acrylicBlur: blur(30px) saturate(125%);
+  --acrylicBlurThin: blur(20px) saturate(140%);
+  --micaBase: #f3f6f9;
+  --fxNoise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
+  --fxNoiseOpacity: 0.028;
+
+  /* 站点特效令牌（由品牌色派生） */
+  --fxGridLine: rgba(9, 151, 225, 0.085);
+  --fxGridSize: 56px;
+  --fxWash1: rgba(102, 204, 255, 0.44);
+  --fxWash2: rgba(31, 174, 249, 0.2);
+  --fxWash3: rgba(8, 125, 186, 0.1);
+  --fxGlow: rgba(102, 204, 255, 0.5);
+  --fxGlowSoft: rgba(102, 204, 255, 0.22);
+  --fxSheen: linear-gradient(105deg, transparent 34%, rgba(102, 204, 255, 0.16), transparent 66%);
+  --fxHairline: rgba(9, 151, 225, 0.16);
+  --fxCursorGlow: radial-gradient(circle, rgba(102, 204, 255, 0.2), transparent 62%);
+
+  /* 布局 */
+  --nav-h: 64px;        /* 桌面顶栏高度，同时作为内容顶部避让高度 */
+  --maxw: 1240px;
+  --wrapPadX: 32px;
+}
+
+/* 深色主题（Fluent 2 web dark theme） */
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* 品牌语义令牌：深色下反过来，文字变浅、底色变深 */
+  --colorBrandBackground: var(--colorBrand60);
+  --colorBrandBackgroundHover: var(--colorBrand50);
+  --colorBrandBackgroundPressed: var(--colorBrand40);
+  --colorBrandBackground2: #062c40;
+  --colorBrandBackground2Hover: #07405c;
+  --colorBrandBackground2Pressed: #05527a;
+  --colorBrandForeground1: var(--colorBrand50);
+  --colorBrandForeground2: var(--colorBrand40);
+  --colorBrandForeground2Hover: var(--colorBrand30);
+  --colorBrandForegroundLink: var(--colorBrand50);
+  --colorBrandForegroundLinkHover: var(--colorBrand40);
+  --colorBrandForegroundLinkPressed: var(--colorBrand40);
+  --colorBrandStroke1: var(--colorBrand70);
+  --colorBrandStroke2: var(--colorBrand130);
+  --colorBrandStroke2Contrast: #07405c;
+  --colorCompoundBrandStroke: var(--colorBrand60);
+  --colorCompoundBrandStrokeHover: var(--colorBrand50);
+  --colorCompoundBrandStrokePressed: var(--colorBrand40);
+
+  --colorNeutralForeground1: #ffffff;
+  --colorNeutralForeground2: #d6d6d6;
+  --colorNeutralForeground3: #adadad;
+  --colorNeutralForeground4: #999999;
+  --colorNeutralForegroundDisabled: #5c5c5c;
+  --colorNeutralForegroundInverted: #242424;
+  --colorNeutralForeground2Hover: #ffffff;
+  --colorNeutralForeground2Pressed: #ffffff;
+  --colorNeutralForeground2Selected: #ffffff;
+  --colorNeutralForeground2BrandHover: var(--colorBrand50);
+  --colorNeutralForeground2BrandPressed: var(--colorBrand40);
+  --colorNeutralForeground2BrandSelected: var(--colorBrand50);
+  --colorNeutralForeground3Hover: #d6d6d6;
+  --colorNeutralForeground3Pressed: #d6d6d6;
+  --colorNeutralForeground3Selected: #d6d6d6;
+  --colorNeutralForeground3BrandHover: var(--colorBrand50);
+  --colorNeutralForeground3BrandPressed: var(--colorBrand40);
+  --colorNeutralForeground3BrandSelected: var(--colorBrand50);
+  --colorNeutralForegroundOnBrand: var(--colorBrand160);
+
+  --colorNeutralBackground1: #292929;
+  --colorNeutralBackground1Hover: #3d3d3d;
+  --colorNeutralBackground1Pressed: #1f1f1f;
+  --colorNeutralBackground1Selected: #383838;
+  --colorNeutralBackground2: #1f1f1f;
+  --colorNeutralBackground2Hover: #333333;
+  --colorNeutralBackground2Pressed: #141414;
+  --colorNeutralBackground2Selected: #2e2e2e;
+  --colorNeutralBackground3: #141414;
+  --colorNeutralBackground3Hover: #2e2e2e;
+  --colorNeutralBackground3Pressed: #0a0a0a;
+  --colorNeutralBackground3Selected: #242424;
+  --colorNeutralBackground4: #0a0a0a;
+  --colorNeutralBackground4Hover: #1a1a1a;
+  --colorNeutralBackground4Pressed: #000000;
+  --colorNeutralBackground4Selected: #141414;
+  --colorNeutralBackground5: #000000;
+  --colorNeutralBackground6: #333333;
+  --colorNeutralBackgroundInverted: #ffffff;
+  --colorNeutralBackgroundStatic: #3d3d3d;
+  --colorNeutralBackgroundAlpha: rgba(26, 26, 26, 0.5);
+  --colorNeutralBackgroundAlpha2: rgba(31, 31, 31, 0.7);
+  --colorSubtleBackgroundHover: #383838;
+  --colorSubtleBackgroundPressed: #2e2e2e;
+  --colorSubtleBackgroundSelected: #333333;
+
+  --colorNeutralStroke1: #666666;
+  --colorNeutralStroke1Hover: #757575;
+  --colorNeutralStroke1Pressed: #6b6b6b;
+  --colorNeutralStroke1Selected: #707070;
+  --colorNeutralStroke2: #525252;
+  --colorNeutralStroke3: #3d3d3d;
+  --colorNeutralStrokeSubtle: #0a0a0a;
+  --colorNeutralStrokeAccessible: #adadad;
+  --colorNeutralStrokeAccessibleHover: #bdbdbd;
+  --colorNeutralStrokeAccessiblePressed: #b3b3b3;
+  --colorNeutralStrokeAccessibleSelected: var(--colorBrand50);
+  --colorNeutralStrokeDisabled: #424242;
+  --colorNeutralStrokeAlpha: rgba(255, 255, 255, 0.1);
+  --colorNeutralStrokeAlpha2: rgba(255, 255, 255, 0.2);
+
+  --colorNeutralShadowAmbient: rgba(0, 0, 0, 0.24);
+  --colorNeutralShadowKey: rgba(0, 0, 0, 0.28);
+  --colorNeutralShadowAmbientDarker: rgba(0, 0, 0, 0.32);
+  --colorNeutralShadowKeyDarker: rgba(0, 0, 0, 0.36);
+
+  --colorNeutralStencil1: #333333;
+  --colorNeutralStencil2: #2e2e2e;
+
+  --colorStatusDangerBackground1: #3b1619;
+  --colorStatusDangerForeground1: #dc626d;
+  --colorStatusDangerForeground3: #e9838a;
+  --colorStatusDangerBorder1: #b10e1c;
+  --colorStatusSuccessBackground1: #052505;
+  --colorStatusSuccessForeground1: #54b054;
+  --colorStatusSuccessBorder1: #0e700e;
+  --colorStatusWarningBackground1: #4c1a05;
+  --colorStatusWarningForeground1: #f4a06b;
+  --colorStatusWarningBorder1: #bc4b09;
+
+  --colorStrokeFocus1: #000000;
+  --colorStrokeFocus2: #ffffff;
+
+  --colorBackgroundAcrylic: rgba(44, 44, 44, 0.85);
+  --colorBackgroundAcrylic2: rgba(41, 41, 41, 0.72);
+  --micaBase: #1a1a1a;
+  --fxNoiseOpacity: 0.05;
+
+  --fxGridLine: rgba(102, 204, 255, 0.06);
+  --fxWash1: rgba(102, 204, 255, 0.16);
+  --fxWash2: rgba(31, 174, 249, 0.12);
+  --fxWash3: rgba(2, 44, 64, 0.5);
+  --fxGlow: rgba(102, 204, 255, 0.45);
+  --fxGlowSoft: rgba(102, 204, 255, 0.16);
+  --fxSheen: linear-gradient(105deg, transparent 34%, rgba(102, 204, 255, 0.12), transparent 66%);
+  --fxHairline: rgba(102, 204, 255, 0.14);
+  --fxCursorGlow: radial-gradient(circle, rgba(102, 204, 255, 0.14), transparent 62%);
+}

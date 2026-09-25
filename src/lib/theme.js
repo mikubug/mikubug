@@ -1,32 +1,36 @@
-/* ============================================================
-   主题状态 —— light / dark
-   - 首次访问跟随系统偏好,之后记在 localStorage
-   - 切换时若有 View Transitions 支持,做一圈圆形揭示
-   - index.html 里有同逻辑的内联脚本,负责首屏防闪烁
-   ============================================================ */
+/* theme.js — 主题 light / dark
+   没手动切换过就跟随系统 prefers-color-scheme（系统变了也跟着变）；
+   手动切过一次就记进 localStorage（mikubug.theme），之后不再跟随。
+   index.html 有同逻辑的内联脚本，负责首屏防闪色。 */
 
 import { ref } from 'vue';
 
 const KEY = 'mikubug.theme';
 
-/** 读取初始主题:本地记录优先,没有记录则默认浅色 */
-function readTheme() {
+/** 手动选择过的主题；从没选过返回 null（= 跟随系统） */
+function manualTheme() {
   try {
-    const saved = localStorage.getItem(KEY);
-    if (saved === 'light' || saved === 'dark') return saved;
+    const v = localStorage.getItem(KEY);
+    if (v === 'light' || v === 'dark') return v;
   } catch {
-    /* 隐私模式下 localStorage 可能不可用 */
+    /* 隐私模式可能禁用 localStorage */
   }
-  return 'light';
+  return null;
 }
 
-/** 当前主题(响应式,模板里可直接用) */
-export const theme = ref(readTheme());
+/** 系统当前是否深色 */
+const systemDark = () =>
+  typeof window !== 'undefined' && window.matchMedia
+    ? window.matchMedia('(prefers-color-scheme: dark)').matches
+    : false;
+
+/** 当前主题（响应式）；初始值：手动记录优先，否则跟随系统 */
+export const theme = ref(manualTheme() || (systemDark() ? 'dark' : 'light'));
 
 /** 是否深色 */
 export const isDark = () => theme.value === 'dark';
 
-/** 把主题落到 <html> 上 */
+/** 把主题落到 <html>；persist=false 表示这次改动不算"手动选择" */
 export function applyTheme(value, persist = true) {
   theme.value = value;
   const root = document.documentElement;
@@ -34,14 +38,14 @@ export function applyTheme(value, persist = true) {
   root.style.colorScheme = value;
 
   const meta = document.querySelector('meta[name="theme-color"]');
-  if (meta) meta.setAttribute('content', value === 'dark' ? '#04060c' : '#f2f7fc');
+  if (meta) meta.setAttribute('content', value === 'dark' ? '#1a1a1a' : '#f3f6f9');
 
   if (persist) {
     try { localStorage.setItem(KEY, value); } catch { /* 忽略 */ }
   }
 }
 
-/** 切换主题;origin 传 { x, y } 时圆形揭示从该点展开 */
+/** 切换主题；origin 传 { x, y } 时圆形揭示从该点展开 */
 export function toggleTheme(origin) {
   const next = theme.value === 'light' ? 'dark' : 'light';
   const x = origin?.x ?? window.innerWidth - 80;
@@ -62,4 +66,12 @@ export function toggleTheme(origin) {
   window.setTimeout(() => root.classList.remove('theme-anim'), 560);
 }
 
-/** 系统偏好变化时不再自动跟随 —— 主题只由用户手动决定 */
+/** 还没手动切过时，系统明暗变化就跟着变 */
+export function followSystemTheme() {
+  if (typeof window === 'undefined' || !window.matchMedia) return;
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+  mq.addEventListener('change', () => {
+    if (manualTheme()) return; // 手动选过就不再跟随
+    applyTheme(mq.matches ? 'dark' : 'light', false);
+  });
+}

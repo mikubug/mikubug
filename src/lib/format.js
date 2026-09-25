@@ -24,3 +24,21 @@ export function relTime(v) {
   if (diff < day * 30) return `${Math.floor(diff / day)} 天前`;
   return fmtDate(v);
 }
+
+/* 作者 */
+
+/** 把作者串拆成名字数组:支持 & , ，、; / 与 " 和 " 分隔 */
+export function parseAuthors(writer) {
+  return String(writer || '')
+    .split(/[&,，、;；/]|\s+和\s+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
+}
+
+/** 作者行：1 人「作者：xxx」，多人「作者：A，B 和 C 联合编写」 */
+export function fmtAuthors(writer) {
+  const names = parseAuthors(writer);
+  if (!names.length) return '';
+  if (names.length === 1) return `作者：${names[0]}`;
+  return `作者：${names.slice(0, -1).join('，')} 和 ${names[names.length - 1]} 联合编写`;
+}

@@ -1,8 +1,5 @@
 <script setup>
-/**
- * 明暗主题开关 —— 开关(switch)式,不是普通按钮
- * 点击任意位置切换;圆形揭示动画从指针处展开
- */
+/** 明暗主题开关（role="switch"），点击处展开圆形揭示动画 */
 import { computed } from 'vue';
 import { theme, toggleTheme } from '../lib/theme';
 

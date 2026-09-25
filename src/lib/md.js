@@ -1,9 +1,6 @@
-/* ============================================================
-   md.js — 轻量 Markdown 渲染 + Front-matter 解析
-   零依赖。目标:够用、安全(转义 HTML)、体积小。
-   ============================================================ */
+/* md.js — 轻量 Markdown 渲染 + Front-matter 解析（零依赖，输出前先转义 HTML） */
 
-/* ---------- 1. HTML 转义:所有文本先转义,再做行内标记 ---------- */
+/* 1. HTML 转义：所有文本先转义，再做行内标记 */
 function esc(s) {
   return String(s)
     .replace(/&/g, '&amp;')
@@ -13,15 +10,8 @@ function esc(s) {
     .replace(/'/g, '&#39;');
 }
 
-/* ---------- 2. 解析 front-matter ----------
-   支持两种写法(可混用):
-     writer:liyifan202201;tags=xxx/yyy/zzz;url=xxx
-     ---
-     writer: liyifan202201
-     tags: xxx/yyy/zzz
-     ---
-   返回 { meta: {...}, body: '...' }
-*/
+/* 2. 解析 front-matter
+   两种写法：单行 `writer:xxx;tags=a/b;url=x`，或 `---` 包起来的 YAML 块 */
 export function parseFrontMatter(raw) {
   const text = String(raw).replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
   const meta = {};
@@ -62,9 +52,7 @@ export function parseFrontMatter(raw) {
   return { meta, body };
 }
 
-/* ---------- 3. 行内标记 ----------
-   顺序很重要:先处理 code,避免内部被再次解析。
-*/
+/* 3. 行内标记 */
 function inline(src) {
   let out = esc(src);
 
@@ -108,7 +96,7 @@ function inline(src) {
   return out;
 }
 
-/* ---------- 4. 块级渲染 ---------- */
+/* 4. 块级渲染 */
 export function renderMarkdown(src) {
   const lines = String(src).replace(/\r\n?/g, '\n').split('\n');
   const out = [];
@@ -219,7 +207,7 @@ export function renderMarkdown(src) {
   return out.join('\n');
 }
 
-/* ---------- 5. 提取纯文本(用于列表摘要) ---------- */
+/* 5. 提取纯文本(用于列表摘要) */
 export function toPlain(src, limit = 100) {
   const t = String(src)
     .replace(/```[\s\S]*?```/g, ' ')          // 代码块

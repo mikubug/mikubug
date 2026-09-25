@@ -1,9 +1,5 @@
-/* ============================================================
-   路由表 —— history 模式(真路由)
-   地址栏是 /works/xxx 这样的真路径,没有 #。
-   代价:静态托管需要把未知路径回退到 index.html,
-   本项目已内置 public/404.html 兜底(GitHub Pages 等纯静态也能跑)。
-   ============================================================ */
+/* router — history 真路由（地址栏是 /works/xxx，无 #）
+   静态托管的未知路径回退见 public/404.html；base 与 Vite 的 base 保持一致 */
 
 import { createRouter, createWebHistory } from 'vue-router';
 

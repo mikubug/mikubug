@@ -17,7 +17,12 @@ import { music, player, MUSIC_TITLE } from '../lib/player';
       <div class="player-sub">{{ player.status }}</div>
     </div>
 
-    <div class="player-wave" :class="{ on: player.playing }" aria-hidden="true">
+    <!-- 律动条：播放时跳动；缓冲时改成缓慢呼吸，别再让人以为卡死了 -->
+    <div
+      class="player-wave"
+      :class="{ on: player.playing && !player.buffering, slow: player.buffering }"
+      aria-hidden="true"
+    >
       <i></i><i></i><i></i><i></i>
     </div>
 

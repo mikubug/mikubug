@@ -1,17 +1,20 @@
-/* ============================================================
-   content.js — 内容层
-   ------------------------------------------------------------
-   成果文档:构建期用 import.meta.glob 扫描 ./repo/ 下的所有 .md,
-   由 Vite 编译进包内。
-   → 不需要 index.json,不需要任何清单文件,新增文档只要丢进 repo/ 即可。
-   → 站点仍是纯静态,运行时零额外请求。
-
-   公告 / 关于:public/ 下的 JSON,运行时 fetch(便于不改代码就能更新)。
-   ============================================================ */
+/* content.js — 内容层
+   成果：构建期扫描 repo/*.md，编译进包内，运行时零请求；
+   公告 / 关于：运行时 fetch public/*.json5，不改代码也能更新。 */
 
 import { parseFrontMatter, toPlain } from './md';
 
-/* ---------- 成果文档 ---------- */
+/* JSON5 解析器：动态 import，由 Vite 拆成独立 chunk */
+
+let json5Mod = null;
+
+/** 解析 JSON5 文本 */
+async function parseJson5(text) {
+  if (!json5Mod) json5Mod = await import('./json5');
+  return json5Mod.parseJson5(text);
+}
+
+/* 成果文档 */
 
 const sources = import.meta.glob('/repo/*.md', {
   eager: true,
@@ -51,18 +54,18 @@ export const ALL_TAGS = [...new Set(DOCS.flatMap((d) => d.tags))].sort();
 /** 按文件名查文档 */
 export const findDoc = (file) => DOCS.find((d) => d.file === file) || null;
 
-/* ---------- 公告 ---------- */
+/* 公告 */
 
 const asset = (p) => import.meta.env.BASE_URL + p;
 
 /**
- * 读取 public/notice.json
+ * 读取 public/notice.json5
  * 支持数组或 { notices | items: [...] } 两种结构
  */
 export async function loadNotices() {
-  const res = await fetch(asset('notice.json'), { cache: 'no-cache' });
-  if (!res.ok) throw new Error(`notice.json ${res.status}`);
-  const data = await res.json();
+  const res = await fetch(asset('notice.json5'), { cache: 'no-cache' });
+  if (!res.ok) throw new Error(`notice.json5 ${res.status}`);
+  const data = await parseJson5(await res.text());
   const list = Array.isArray(data) ? data : data.notices || data.items || [];
 
   return list
@@ -80,13 +83,24 @@ export async function loadNotices() {
     });
 }
 
-/* ---------- 关于 / 加入(可选) ---------- */
+/* 关于 / 加入（可选）：public/about.json5、public/join.json5 */
 
 export async function loadAbout() {
   try {
-    const res = await fetch(asset('about.json'), { cache: 'no-cache' });
+    const res = await fetch(asset('about.json5'), { cache: 'no-cache' });
     if (!res.ok) return null;
-    return await res.json();
+    return parseJson5(await res.text());
+  } catch {
+    return null;
+  }
+}
+
+/** 加入页文案：slides / channels / join，读不到时由组件用兜底文案 */
+export async function loadJoin() {
+  try {
+    const res = await fetch(asset('join.json5'), { cache: 'no-cache' });
+    if (!res.ok) return null;
+    return parseJson5(await res.text());
   } catch {
     return null;
   }

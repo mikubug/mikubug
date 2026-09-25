@@ -1,0 +1,42 @@
+// 加入页全部文案（JSON5）
+// slides   分页卡片，每页一张；detail 是卡片正文
+// channels 底部联系渠道，有 href 才渲染成链接
+// join     最后一页的 Markdown 正文，留空则用该页的 detail
+
+{
+  slides: [
+    {
+      kicker: '01 / WHY',
+      title: '为什么加入凌云社？',
+      desc: '把好奇心变成真实项目，在协作中建立自己的技术坐标。',
+      detail: '凌云社是周南梅溪湖中学的科创社团。我们更相信亲手做出来的东西 —— 无论你从硬件、软件还是创意出发，都能在这里找到一个真正做得完的项目，而不是只停在一份企划书上。',
+    },
+    {
+      kicker: '02 / WHAT',
+      title: '你会参与什么？',
+      desc: '从硬件、软件到创意实验，选择一个方向，和伙伴一起完成作品。',
+      detail: '方向覆盖 ESP32 与单片机、电路与传感器、Python 与前端、3D 建模与打印，以及把想法做成实物的各种尝试。可以自己立项，也可以加入别人正在推进的项目，按兴趣认领任务。',
+    },
+    {
+      kicker: '03 / HOW',
+      title: '我们如何协作？',
+      desc: '开放讨论、短周期迭代、清晰记录，让每个人都能贡献自己的部分。',
+      detail: '每周固定活动时间，开放讨论、短周期迭代、把过程写进文档。项目走到哪一步谁都看得到，也随时可以接手 —— 不需要先成为「高手」再加入。',
+    },
+    {
+      kicker: '04 / JOIN',
+      title: '准备好了吗？',
+      desc: '向下了解联系方式，发来你的想法，下一次活动见。',
+      detail: '把我们当作一群一起做东西的人就好：说说你想做什么，或者直接带着问题来。邮箱、QQ、微信都在下面，也欢迎到 GITHUB 看我们正在做的项目。',
+    },
+  ],
+
+  channels: [
+    { key: 'EMAIL', value: 'liyifan202201@outlook.com', href: 'mailto:liyifan202201@outlook.com' },
+    { key: 'QQ', value: '375536697' },
+    { key: 'WECHAT', value: 'wxid_w6ig15tttmx122' },
+    { key: 'GITHUB', value: 'mikubug', href: 'https://github.com/mikubug' },
+  ],
+
+  join: '',
+}

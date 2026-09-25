@@ -1,0 +1,23 @@
+// 公告数据（JSON5）。正文可直接换行，按 Markdown 渲染。
+// 字段：title 标题 / publisher 发布者 / date 日期 YYYY-MM-DD / pinned 置顶 / tags 标签 / body 正文
+
+[
+  {
+    title: '凌云社 MikuBug 官方网站上线',
+    publisher: 'liyifan202201',
+    date: '2026-09-16',
+    pinned: true,
+    tags: ['站点', '公告'],
+    body: '凌云社全新官方网站正式上线。
+
+本站已重构为**纯静态站点**,不再依赖任何后端服务,访问更快、更稳。
+
+主要变化:
+
+- 五个板块独立解耦:首页 / 公告 / 成果 / 关于 / 加入
+- 公告由 `notice.json5` 驱动,直接编辑即可更新
+- 成果以 Markdown 文档形式沉淀在 `repo/` 目录
+
+欢迎各处参观。',
+  },
+]

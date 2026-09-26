@@ -5,16 +5,18 @@
 :root {
   color-scheme: light;
 
-  /* 字体族：中文走微软雅黑，西文走等宽控制台字体。
-     拉丁字体放栈首，中文字符在它里找不到字形，会自动落到雅黑 */
-  --fontFamilyBase:
-    'Cascadia Mono', Consolas, 'Microsoft YaHei UI', 'Microsoft YaHei',
-    system-ui, sans-serif;
-  --fontFamilyDisplay:
-    'Cascadia Mono', Consolas, 'Microsoft YaHei UI', 'Microsoft YaHei',
-    system-ui, sans-serif;
-  --fontFamilyMonospace:
-    'Cascadia Mono', Consolas, 'SFMono-Regular', ui-monospace, monospace;
+  /* 字体族：西文走等宽控制台体，中文交给各平台自带黑体。
+     拉丁字体放栈首，中文字符在它里找不到字形才会往后落 ——
+     雅黑只覆盖 Windows，macOS / Linux / Android 各留一档兜底 */
+  --fontStackLatin:
+    'Cascadia Mono', 'Cascadia Code', Consolas, 'SFMono-Regular', Menlo,
+    'DejaVu Sans Mono', 'Liberation Mono', ui-monospace;
+  --fontStackCJK:
+    'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB',
+    'Noto Sans CJK SC', 'Source Han Sans SC', 'WenQuanYi Micro Hei';
+  --fontFamilyBase: var(--fontStackLatin), var(--fontStackCJK), system-ui, sans-serif;
+  --fontFamilyDisplay: var(--fontFamilyBase);
+  --fontFamilyMonospace: var(--fontStackLatin), var(--fontStackCJK), monospace;
 
   /* 字号 / 行高（Fluent 2 type ramp） */
   --fontSize100: 10px;  --lineHeight100: 14px;

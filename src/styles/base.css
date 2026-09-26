@@ -186,48 +186,24 @@ button, input { font: inherit; color: inherit; }
   height: var(--nav-h);
 }
 
-/* 品牌区 */
+/* 品牌区：只有艺术字 logo，不再挂文字社名 */
 
 .brand {
   display: flex;
   align-items: center;
-  gap: var(--spacingMNudge);
   flex-shrink: 0;
 }
 
 .brand-logo {
-  width: 30px; height: 30px;
-  border-radius: var(--borderRadiusXLarge);
-  object-fit: cover;
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
+  height: 36px;
+  width: auto;
+  opacity: 0.94;
   transition:
-    transform var(--durationSlow) var(--curveEasyEaseMax),
-    border-color var(--durationNormal) var(--curveEasyEase),
-    box-shadow var(--durationNormal) var(--curveEasyEase);
+    opacity var(--durationNormal) var(--curveEasyEase),
+    transform var(--durationSlow) var(--curveEasyEaseMax);
 }
 
-.brand:hover .brand-logo {
-  transform: scale(1.06);
-  border-color: var(--colorBrandStroke1);
-  box-shadow: var(--shadow8Brand);
-}
-
-.brand-text { display: grid; line-height: 1.15; }
-
-.brand-name {
-  font-family: var(--fontFamilyDisplay);
-  font-size: var(--fontSize300);
-  font-weight: var(--fontWeightSemibold);
-  letter-spacing: 0.14em;
-  color: var(--colorNeutralForeground1);
-}
-
-.brand-sub {
-  font-size: var(--fontSize100);
-  line-height: var(--lineHeight100);
-  color: var(--colorNeutralForeground3);
-  letter-spacing: 0.1em;
-}
+.brand:hover .brand-logo { opacity: 1; transform: translateY(-1px); }
 
 /* 导航项：胶囊 + 底部指示条 */
 
@@ -681,6 +657,31 @@ html[data-theme='dark'] .theme-track-icon.sun { opacity: 0.5; }
 }
 .footer a:hover { color: var(--colorBrandForegroundLinkHover); text-decoration: underline; }
 
+/* 校徽:图片是深字透明底，深色主题下反色成浅字，卡片底色也跟着明暗走 */
+.footer-school {
+  display: block;
+  padding: 3px var(--spacingS);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusMedium);
+  background: var(--colorNeutralBackground1);
+  transition:
+    border-color var(--durationNormal) var(--curveEasyEase),
+    box-shadow var(--durationNormal) var(--curveEasyEase),
+    transform var(--durationGentle) var(--curveEasyEaseMax);
+}
+
+/* 深色下反色 —— invert 管黑白，hue-rotate(180deg) 把被带偏的色相转回来，
+   这样只有白/黑互换，校徽本身的蓝不会变成橙 */
+html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg); }
+
+.footer-school:hover {
+  border-color: var(--colorBrandStroke1);
+  box-shadow: var(--shadow4);
+  transform: translateY(-1px);
+}
+
+.footer-school img { display: block; height: 22px; width: auto; }
+
 /* 状态 / 骨架屏 */
 
 .state {
@@ -983,10 +984,28 @@ html[data-theme='dark'] .theme-track-icon.sun { opacity: 0.5; }
 
   .island-list { padding: var(--spacingS) var(--spacingS) 0; }
 
-  .brand-sub { display: none; }
+  .brand-logo { height: 30px; }
+
+  /* 手机:左边两行文字，右边校徽 */
+  .footer {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: var(--spacingL);
+    row-gap: 2px;
+    padding: var(--spacingL) var(--wrapPadX) var(--spacingXXL);
+  }
+  .footer > span:nth-child(1) { grid-area: 1 / 1; }
+  .footer > span:nth-child(2) { grid-area: 2 / 1; }
+  .footer-school {
+    grid-area: 1 / 2 / span 2 / span 1;
+    justify-self: end;
+    padding: 2px var(--spacingSNudge);
+  }
+  .footer-school img { height: 18px; }
+
   .wrap { padding: 40px var(--wrapPadX) 76px; }
   .player { right: var(--spacingL); padding: var(--spacingSNudge) var(--spacingMNudge) var(--spacingSNudge) var(--spacingSNudge); }
-  .footer { padding: var(--spacingL) var(--wrapPadX) var(--spacingXXL); }
 }
 
 @media (max-width: 560px) {
@@ -994,7 +1013,6 @@ html[data-theme='dark'] .theme-track-icon.sun { opacity: 0.5; }
   .theme-knob { width: 16px; height: 16px; margin-top: -8px; }
   .theme-switch[aria-checked='true'] .theme-knob { transform: translateX(22px); }
   .theme-track-icon { display: none; }
-  .brand-name { font-size: 12.5px; letter-spacing: 0.06em; }
 }
 
 /* 主题切换:圆形揭示（View Transitions） */

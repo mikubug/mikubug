@@ -3,10 +3,15 @@
 export const SITE = {
   en: 'MIKUBUG',
   cn: '凌云社',
-  full: '周南梅溪湖中学凌云社',
   tagline: '探索前沿技术 · 汇聚创造力量',
   github: 'https://github.com/mikubug',
+  /* 学校官网（页脚校徽指向它） */
+  school: 'http://www.znmxh.cn/',
+  /* 顶栏艺术字 logo（明暗各一份，按当前主题换） */
   logo: import.meta.env.BASE_URL + 'assets/logo.png',
+  logoDark: import.meta.env.BASE_URL + 'assets/logo-dark.png',
+  /* 页脚校徽条幅 */
+  schoolLogo: import.meta.env.BASE_URL + 'assets/school-logo.png',
 };
 
 /** 主导航（首页不在导航里，由左上角 Logo 承载） */

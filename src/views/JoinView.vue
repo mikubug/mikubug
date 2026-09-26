@@ -12,20 +12,12 @@ import MarkdownBlock from '../components/MarkdownBlock.vue';
 
 /* join.json5 读不到时的兜底，保证页面永远有内容 */
 const FALLBACK_SLIDES = [
-  { kicker: '01 / WHY', title: '为什么加入凌云社？', desc: '把好奇心变成真实项目，在协作中建立自己的技术坐标。' },
-  { kicker: '02 / WHAT', title: '你会参与什么？', desc: '从硬件、软件到创意实验，选择一个方向，和伙伴一起完成作品。' },
-  { kicker: '03 / HOW', title: '我们如何协作？', desc: '开放讨论、短周期迭代、清晰记录，让每个人都能贡献自己的部分。' },
-  { kicker: '04 / JOIN', title: '准备好了吗？', desc: '向下了解联系方式，发来你的想法，下一次活动见。' },
 ];
 
 /* 只有 http(s) 才按外链打开，mailto 之类走浏览器默认行为 */
 const isExternal = (href) => /^https?:/i.test(href);
 
 const FALLBACK_CHANNELS = [
-  { key: 'EMAIL', value: 'liyifan202201@outlook.com', href: 'mailto:liyifan202201@outlook.com' },
-  { key: 'QQ', value: '375536697' },
-  { key: 'WECHAT', value: 'wxid_w6ig15tttmx122' },
-  { key: 'GITHUB', value: 'mikubug', href: 'https://github.com/mikubug' },
 ];
 
 const data = ref(null);
@@ -52,12 +44,7 @@ onMounted(async () => {
 <template>
   <section class="page">
     <div class="wrap">
-      <div class="join-deck-head">
-        <PageHead :kicker="currentSlide.kicker || ''" :title="currentSlide.title || ''" :desc="currentSlide.desc || ''" />
-        <div class="join-dots" aria-label="加入流程分页">
-          <button v-for="(_, i) in slides" :key="i" :class="{ on: slide === i }" :aria-label="`第 ${i + 1} 页`" @click="slide = i"></button>
-        </div>
-      </div>
+      <PageHead :kicker="currentSlide.kicker || ''" :title="currentSlide.title || ''" :desc="currentSlide.desc || ''" />
 
       <Transition name="deck" mode="out-in">
         <div :key="slide" class="join-slide">
@@ -76,11 +63,22 @@ onMounted(async () => {
         </div>
       </Transition>
 
+      <!-- 翻页控件：箭头 / 分页点 / 页码，都在同一行 -->
       <div class="join-controls">
-        <button class="deck-arrow" :disabled="slide === 0" @click="prevSlide">←</button>
-        <div class="deck-progress"><span :style="{ width: `${((slide + 1) / slides.length) * 100}%` }"></span></div>
+        <button class="deck-arrow" :disabled="slide === 0" aria-label="上一页" @click="prevSlide">←</button>
+        <div class="join-dots" role="tablist" aria-label="加入流程分页">
+          <button
+            v-for="(_, i) in slides"
+            :key="i"
+            role="tab"
+            :class="{ on: slide === i }"
+            :aria-selected="slide === i"
+            :aria-label="`第 ${i + 1} 页`"
+            @click="slide = i"
+          ></button>
+        </div>
         <span class="deck-count mono">{{ String(slide + 1).padStart(2, '0') }} / {{ String(slides.length).padStart(2, '0') }}</span>
-        <button class="deck-arrow" :disabled="isLast" @click="nextSlide">→</button>
+        <button class="deck-arrow" :disabled="isLast" aria-label="下一页" @click="nextSlide">→</button>
       </div>
 
       <hr v-reveal="120" class="rule" />

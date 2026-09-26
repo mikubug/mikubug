@@ -1,7 +1,7 @@
 # 凌云社 MikuBug
 
 Vue 3 + Vite 的**纯静态**社团站（无后端），产物 `dist/` 丢到任意静态托管即可。
-英文名 **MikuBug**，中文名 **凌云社**（周南梅溪湖中学凌云社），主题色 **#66CCFF**。
+英文名 **MikuBug**，中文名 **凌云社**（周南梅溪湖中学凌云社）
 部署在 <https://github.com/mikubug/mikubug.github.io>。
 
 ## 命令

@@ -13,51 +13,98 @@ const ENTRIES = [
 /* 终端打字机：打字 → 停留 → 整段清空 → 换行 */
 
 /** 每行用短句，太长会折行 */
+
 const LINES = [
+
   '探索前沿技术 · 汇聚创造力量',
-  '记录每一次尝试与成果',
+
   '从想法出发 · 把创意变成现实',
+
   'DeepSeek 不要吃白饭了！！！',
+
   '让每一个奇思妙想落地',
-  '把兴趣变成真正的作品',
+
   '做真正有意思的东西',
-  '欢迎加入我们',
+
   '欢迎来到凌云社',
-  '欢迎来到 MikuBug',
-  '没有 Bug 的项目是不完整的',
-  'Bug 不可怕，可怕的是没有 Bug',
-  '能跑就行？当然还要能跑得更远',
-  '程序崩了？重启一下再说',
-  '100 行代码，但是有 1000 行报错',
-  '让硬件真正动起来',
+
+  'Welcome MikuBug!',
+
+  '能跑就行？这不重要',
+
+  '100 行代码，但是有 1000 行报错...',
+
   '3D 打印，把想象变成实体',
-  '把二次元带进现实',
-  '科技与 ACG 的奇妙碰撞',
-  '一群二次猿......',
-  '这里有代码，也有二次元',
-  '这里有洛天依，也有初音未来',
-  '看我把你 MikuMiku！',
+
+  '看我把你 MikuMiku 掉！',
+
   '初始之音，畅想未来！',
+
   '小笼包，叉烧包，还有芝麻奶黄包...',
-  '我们的代码可能有 Bug',
-  '但我们的想法永远在线',
-  '折腾，是科技社的日常',
-  '好奇心驱动一切',
+
+  '好饿好饿好饿，我真的好饿',
+
   '少年意气，凌云而上',
-  '心怀热爱，探索未知',
-  '凌云而上，探索无限',
+
   '周南梅溪湖现在唯一 ACG 社！',
-  '周南梅溪湖科技与 ACG 的交汇点',
+
+  '周南梅溪湖中学凌云社！',
+
+  '周南梅溪湖第一大科技社团！',
+
   '这里，是我们的凌云社',
-  '这里，是 MikuBug',
+
   '人民万岁！',
+
   '星星之火，可以燎原',
+
   '全世界无产者，联合起来！',
-  'Наша цель — коммунизм!'
+
+  'Наша цель — коммунизм!',
+
+  '科技服务人民',
+
+  '坚持改革开放理念',
+
+  '#include<bits/stdc++.h>',
+
+  '把零件拼成一个世界',
+
+  '实践是检验真理的唯一标准',
+  
+  '这里是科技社，也是 ACG 社',
+
+  '喜欢的东西，就自己做出来',
+
+  '让兴趣成为创造力',
+
+  '年轻就是好，可以折腾',
+
+  '今天的想法，明天的作品',
+
+  '每一次尝试都值得记录',
+
+  '失败也是一种成果',
+
+  '凌云而上，探索无限',
+
+  '从梅溪湖出发',
+
+  '向着未来出发',
+
+  '这里，是我们的凌云社',
+
 ];
 const typed = ref('');
 
-let line = 0;       // 当前行
+/** 随机挑一句，且不和刚打完的重复 */
+const pickLine = (avoid) => {
+  let n = avoid;
+  while (n === avoid) n = Math.floor(Math.random() * LINES.length);
+  return n;
+};
+
+let line = Math.floor(Math.random() * LINES.length); // 每次进站开口也不一样
 let chars = 0;      // 已显示字符数
 let phase = 'type'; // type 打字 / hold 停留 / erase 清空
 let holdLeft = 0;   // 停留剩余帧
@@ -89,10 +136,10 @@ const step = () => {
     return;
   }
 
-  // 整段清掉再换行，逐字回删太慢
+  // 整段清掉再换行，逐字回删太慢；下一句随机挑
   typed.value = '';
   phase = 'type';
-  line = (line + 1) % LINES.length;
+  line = pickLine(line);
   chars = 0;
   timer = setTimeout(step, 380);
 };
@@ -171,7 +218,7 @@ onMounted(() => {
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (still) {
-    typed.value = LINES[0];
+    typed.value = LINES[line];
   } else {
     timer = setTimeout(step, 620);
     scheduleFlicker();
@@ -217,7 +264,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="hero-content">
-          <p class="kicker">MikuBug · {{ SITE.full }}</p>
+          <p class="kicker">MikuBug</p>
           <h1 class="hero-title"><span ref="inkEl" class="hero-title-ink" :data-text="`${SITE.cn}.`">凌云社<span class="dot">.</span></span></h1>
           <p class="hero-sub">{{ SITE.tagline }}</p>
 

@@ -889,12 +889,21 @@ html[data-theme='dark'] .hero-title-ink {
 
 /* 加入 · 渠道卡与分页 */
 
-.join-deck-head { position: relative; }
+.join-slide { min-height: 148px; }
 
-.join-dots { display: flex; gap: var(--spacingS); margin-top: var(--spacingXXL); }
+.join-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacingM);
+  margin-top: var(--spacingXXL);
+}
+
+/* 分页点：和翻页箭头同一行，点一下直接跳页 */
+.join-dots { display: flex; align-items: center; gap: var(--spacingSNudge); }
 
 .join-dots button {
-  width: 28px;
+  width: 22px;
   height: 4px;
   padding: 0;
   border: 0;
@@ -903,18 +912,17 @@ html[data-theme='dark'] .hero-title-ink {
   cursor: pointer;
   transition:
     width var(--durationGentle) var(--curveEasyEaseMax),
-    background-color var(--durationGentle) var(--curveEasyEase);
+    background-color var(--durationGentle) var(--curveEasyEase),
+    box-shadow var(--durationGentle) var(--curveEasyEase);
 }
 
 .join-dots button:hover { background: var(--colorNeutralStrokeAccessible); }
 
 .join-dots button.on {
-  width: 48px;
+  width: 40px;
   background: var(--colorCompoundBrandBackground);
   box-shadow: var(--shadow2Brand);
 }
-
-.join-slide { min-height: 148px; }
 
 .join-prompt {
   display: flex;
@@ -973,22 +981,6 @@ html[data-theme='dark'] .hero-title-ink {
   border-color: var(--colorNeutralStrokeDisabled);
   box-shadow: none;
   cursor: default;
-}
-
-.deck-progress {
-  width: 88px;
-  height: 4px;
-  overflow: hidden;
-  border-radius: var(--borderRadiusCircular);
-  background: var(--colorNeutralStroke2);
-}
-
-.deck-progress span {
-  display: block;
-  height: 100%;
-  border-radius: inherit;
-  background: linear-gradient(90deg, var(--colorBrand80), var(--colorBrand60));
-  transition: width var(--durationSlower) var(--curveDecelerateMid);
 }
 
 .deck-count {
@@ -1114,6 +1106,8 @@ html[data-theme='dark'] .hero-title-ink {
   .search { max-width: none; }
   .channel-grid { grid-template-columns: 1fr; }
 
-  .deck-progress { width: 56px; }
+  .join-dots { gap: var(--spacingXS); }
+  .join-dots button { width: 18px; }
+  .join-dots button.on { width: 30px; }
   .notfound .back-link { margin-top: var(--spacingXXL); }
 }

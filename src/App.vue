@@ -11,6 +11,7 @@ import MusicPlayer from './components/MusicPlayer.vue';
 import ThemeToggle from './components/ThemeToggle.vue';
 import { SITE, NAV } from './lib/site';
 import { music } from './lib/player';
+import { theme } from './lib/theme';
 import { flushReveal, forceReveal } from './directives/reveal';
 
 const route = useRoute();
@@ -56,6 +57,9 @@ const onDocPointerDown = (e) => {
 
 /* 导航高亮:成果详情页也点亮「成果」 */
 const activePath = computed(() => (route.path.startsWith('/works') ? '/works' : route.path));
+
+/* Logo 是艺术字，明暗各一份，跟着主题换（手动切和跟随系统都会走到这里） */
+const brandLogo = computed(() => (theme.value === 'dark' ? SITE.logoDark : SITE.logo));
 
 /* 路由切换:收起播放器(音乐继续播)、收起菜单、补一次进场检查 */
 watch(
@@ -105,12 +109,9 @@ onUnmounted(() => {
       <div class="island">
         <!-- 岛面第一行：品牌 / 导航 / 工具 -->
         <div class="island-row">
-          <RouterLink to="/" class="brand" @click="closeMenu">
-            <img class="brand-logo" :src="SITE.logo" :alt="SITE.cn + ' Logo'" width="30" height="30" />
-            <span class="brand-text">
-              <span class="brand-name">{{ SITE.en }}</span>
-              <span class="brand-sub">{{ SITE.cn }}</span>
-            </span>
+          <!-- 品牌位只有艺术字 logo，社名由 logo 本身承担 -->
+          <RouterLink to="/" class="brand" :aria-label="`${SITE.en} ${SITE.cn} 首页`" @click="closeMenu">
+            <img class="brand-logo" :src="brandLogo" :alt="`${SITE.en} · ${SITE.cn}`" width="200" height="65" />
           </RouterLink>
 
           <nav class="nav-links" aria-label="主导航">
@@ -181,7 +182,16 @@ onUnmounted(() => {
       <span>
         <a :href="SITE.github" target="_blank" rel="noopener noreferrer">github.com/mikubug</a>
       </span>
-      <span>{{ SITE.full }}</span>
+      <!-- 原来放校名文字的位置，现在换成校徽，点开学校官网 -->
+      <a
+        class="footer-school"
+        :href="SITE.school"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="长沙市周南梅溪湖中学"
+      >
+        <img :src="SITE.schoolLogo" alt="长沙市周南梅溪湖中学" />
+      </a>
     </footer>
   </div>
 

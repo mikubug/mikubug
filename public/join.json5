@@ -14,9 +14,9 @@
   ],
 
   channels: [
-    { key: 'EMAIL', value: 'liyifan202201@outlook.com', href: 'mailto:liyifan202201@outlook.com' },
+    { key: 'EMAIL', value: 'studio@mikubug.top', href: 'studio@mikubug.top' },
     { key: 'QQ', value: '375536697', href: 'https://qm.qq.com/q/RguiqGmjcs' },
-    { key: '社长 WECHAT', value: 'wxid_w6ig15tttmx122' },
+    { key: '社长/副社长 WECHAT', value: 'world2010999 / wxid_w6ig15tttmx122' },
     { key: 'GITHUB', value: 'Mikubug', href: 'https://github.com/mikubug' },
   ],
 

@@ -1,7 +1,10 @@
 // 加入页全部文案（JSON5）
-// slides   分页卡片，每页一张；detail 是卡片正文
+// slides   分页卡片，每页一张
+//          kicker / title / desc 是标题区（纯文本）
+//          detail 是卡片正文，按 Markdown 渲染；也可以用 markdown / md / body 字段覆盖
 // channels 底部联系渠道，有 href 才渲染成链接
-// join     最后一页的 Markdown 正文，留空则用该页的 detail
+// join     全局 Markdown 正文，最后一页没单独写正文时用它
+// 手机端可以左右滑动翻页，桌面端点箭头 / 分页点 / 方向键
 
 {
   slides: [
@@ -9,6 +12,15 @@
       kicker: '01 / 加入我们',
       title: 'ARE YOU OK',
       desc: 'Only lingyun can do!',
+      detail: '我们在周梅社团中遥遥领先！！！
+
+- Maker Intellengent Key Union
+',
+    },
+    {
+      kicker: '02 / 我们看什么',
+      title: 'I am OK!',
+      desc: 'Lingyun Can Fly!',
       detail: '我们在周梅社团中遥遥领先！！！',
     }
   ],
@@ -16,7 +28,7 @@
   channels: [
     { key: 'EMAIL', value: 'studio@mikubug.top', href: 'mailto:studio@mikubug.top' },
     { key: 'QQ', value: '375536697', href: 'https://qm.qq.com/q/RguiqGmjcs' },
-    { key: '社长/副社长 WECHAT', value: 'world2010999 / wxid_w6ig15tttmx122' },
+    { key: '社长 WECHAT', value: 'world2010999' },
     { key: 'GITHUB', value: 'Mikubug', href: 'https://github.com/mikubug' },
   ],
 

@@ -195,3 +195,48 @@
   border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
   display: block;
 }
+
+/* 手机：标题收紧、留白压缩、表格改为换行不横滚，正文保持 16px 不缩 */
+
+@media (max-width: 720px) {
+  .md { line-height: 1.82; }
+
+  .md h1 {
+    margin: var(--spacingXXL) 0 var(--spacingM);
+    font-size: var(--fontSize600);
+    padding-bottom: var(--spacingS);
+  }
+
+  .md h2 {
+    margin: var(--spacingXXL) 0 var(--spacingM);
+    padding-left: var(--spacingM);
+    font-size: var(--fontSize500);
+  }
+
+  .md h2::before { width: 2px; }
+
+  .md h3 { margin: var(--spacingXL) 0 var(--spacingS); font-size: var(--fontSize400); }
+  .md h4 { margin: var(--spacingL) 0 var(--spacingXS); }
+
+  .md ul, .md ol { padding-left: var(--spacingXXL); }
+  .md li.task { margin-left: -16px; }
+
+  .md blockquote {
+    padding: var(--spacingM) var(--spacingL);
+    border-radius: 0 var(--borderRadiusLarge) var(--borderRadiusLarge) 0;
+  }
+
+  .md pre { padding: var(--spacingM); border-radius: var(--borderRadiusLarge); }
+  .md pre code { font-size: var(--fontSize200); }
+
+  /* 窄屏不做横向滚动，让单元格自己换行 */
+  .md table { min-width: 0; font-size: var(--fontSize200); }
+  .md th {
+    white-space: normal;
+    padding: var(--spacingMNudge) var(--spacingM);
+  }
+  .md td { padding: var(--spacingS) var(--spacingM); }
+
+  .md hr { margin: var(--spacingXL) 0; }
+  .md img { border-radius: var(--borderRadiusLarge); }
+}

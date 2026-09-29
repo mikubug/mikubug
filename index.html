@@ -11,7 +11,7 @@
 <link rel="preload" href="%BASE_URL%assets/logo-dark.png" as="image" media="(prefers-color-scheme: dark)" />
 <script>
   /* 1) 主题：在样式生效前落到 <html>，避免首屏闪色。
-        没手动切换过就跟随系统配色。 */
+        外观模式 system / light / dark；system（默认）跟随系统配色。 */
   (function () {
     var v = null;
     try { v = localStorage.getItem('mikubug.theme'); } catch (e) { /* 忽略 */ }

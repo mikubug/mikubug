@@ -23,6 +23,10 @@ body {
 a { color: inherit; text-decoration: none; }
 button, input { font: inherit; color: inherit; }
 
+/* 触屏：去掉点按灰块和长按选中，交互更像原生 App */
+a, button { -webkit-tap-highlight-color: transparent; }
+button { touch-action: manipulation; user-select: none; }
+
 ::selection {
   background: var(--colorBrand30);
   color: var(--colorBrand160);
@@ -168,6 +172,7 @@ button, input { font: inherit; color: inherit; }
 
 /* 桌面端横向容器；窄屏下变成右上角那颗胶囊 */
 .island {
+  position: relative;
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -175,9 +180,35 @@ button, input { font: inherit; color: inherit; }
   margin: 0 auto;
   padding: 0 var(--wrapPadX);
   overflow: hidden;              /* 窄屏：让面板自内部展开 */
+  animation: island-in var(--durationSlower) var(--curveEasyEaseMax) both;
+}
+
+/* 进场：轻轻落下来一档 */
+@keyframes island-in {
+  from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* 指针掠过岛面时一道很淡的品牌扫光（触屏不参与） */
+@media (hover: hover) {
+  .island::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: linear-gradient(100deg, transparent 34%, var(--colorBrandBackground2) 50%, transparent 66%);
+    opacity: 0;
+    transform: translateX(-70%);
+    transition:
+      transform var(--durationUltraSlow) var(--curveDecelerateMid),
+      opacity var(--durationSlow) var(--curveEasyEase);
+  }
+  .navbar:hover .island::after { opacity: 0.55; transform: translateX(70%); }
 }
 
 .island-row {
+  position: relative;
+  z-index: 1;
   flex: none;
   display: flex;
   align-items: center;
@@ -198,16 +229,27 @@ button, input { font: inherit; color: inherit; }
   height: 36px;
   width: auto;
   opacity: 0.94;
+  transform-origin: left center;
   transition:
     opacity var(--durationNormal) var(--curveEasyEase),
+    filter var(--durationSlow) var(--curveEasyEase),
     transform var(--durationSlow) var(--curveEasyEaseMax);
 }
 
-.brand:hover .brand-logo { opacity: 1; transform: translateY(-1px); }
+.brand:hover .brand-logo {
+  opacity: 1;
+  transform: translateY(-1px) scale(1.03);
+  filter: drop-shadow(0 3px 10px var(--colorBrandBackground2));
+}
+
+/* 滚动后整条岛进入压缩态，艺术字跟着收一点，不抢内容 */
+.navbar.scrolled .brand-logo { transform: scale(0.9); }
+.navbar.scrolled .brand:hover .brand-logo { transform: translateY(-1px) scale(0.94); }
 
 /* 导航项：胶囊 + 底部指示条 */
 
-.nav-links { display: flex; gap: var(--spacingXXS); }
+/* 岛面本身是定位上下文，也让扫光能被裁在岛内 */
+.nav-links { position: relative; display: flex; gap: var(--spacingXXS); }
 
 .nav-link {
   position: relative;
@@ -230,27 +272,47 @@ button, input { font: inherit; color: inherit; }
   background: var(--colorSubtleBackgroundHover);
 }
 
-/* 选中指示条：自下而上长出来，不占交互面积 */
+/* 悬停时的暗示条：从中点向两侧长出来，不占交互面积 */
 .nav-link::after {
   content: '';
   position: absolute;
   left: 50%;
-  bottom: 2px;
+  bottom: 4px;
   width: 18px;
   height: 2px;
   margin-left: -9px;
   border-radius: var(--borderRadiusSmall);
-  background: var(--colorCompoundBrandStroke);
+  background: var(--colorNeutralStroke1);
   transform: scaleX(0);
-  transition: transform var(--durationGentle) var(--curveDecelerateMid);
+  transition:
+    transform var(--durationGentle) var(--curveDecelerateMid),
+    background-color var(--durationGentle) var(--curveEasyEase);
 }
+
+.nav-link:hover::after { transform: scaleX(1); }
 
 .nav-link.active {
   color: var(--colorBrandForeground1);
   font-weight: var(--fontWeightSemibold);
 }
-.nav-link.active::after { transform: scaleX(1); }
+/* 当前位置交给会滑动的 .nav-ind，自己这根就不再出现 */
+.nav-link.active::after { transform: scaleX(0); }
 .nav-link.active:hover { background: var(--colorBrandBackground2); }
+
+/* 滑动指示条：静止时在 hover 那条线上，切页时横着滑过去 */
+.nav-ind {
+  position: absolute;
+  bottom: 4px;
+  height: 2px;
+  border-radius: var(--borderRadiusSmall);
+  background: var(--colorCompoundBrandStroke);
+  box-shadow: var(--shadow2Brand);
+  pointer-events: none;
+  transition:
+    left var(--durationSlower) var(--curveEasyEaseMax),
+    width var(--durationSlower) var(--curveEasyEaseMax),
+    opacity var(--durationNormal) var(--curveDecelerateMid);
+}
 
 /* 岛面右侧工具区 */
 
@@ -564,74 +626,64 @@ button, input { font: inherit; color: inherit; }
 
 .input::-webkit-search-cancel-button { cursor: pointer; }
 
-/* 主题开关（Fluent 2 Switch 造型 + 日月图标） */
+/* 外观模式：跟随系统 / 浅色 / 深色 三段式（滑块跟着走） */
 
-.theme-switch {
+.theme-seg {
+  --seg-w: 26px;
+  --seg-h: 22px;
+
   position: relative;
   flex-shrink: 0;
-  width: 52px;
-  height: 26px;
-  padding: 0;
-  border: var(--strokeWidthThin) solid var(--colorNeutralStrokeAccessible);
+  display: flex;
+  padding: 2px;
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke1);
   border-radius: var(--borderRadiusCircular);
   background: var(--colorNeutralBackground1);
-  cursor: pointer;
   transition:
-    background-color var(--durationGentle) var(--curveEasyEase),
     border-color var(--durationGentle) var(--curveEasyEase),
     box-shadow var(--durationGentle) var(--curveEasyEase);
 }
 
-.theme-switch:hover {
+.theme-seg:hover {
   border-color: var(--colorNeutralStrokeAccessibleHover);
   box-shadow: var(--shadow2);
 }
 
-.theme-track-icon {
+/* 滑块：宽度正好一格，translateX 100% 走一格 */
+.theme-seg-knob {
   position: absolute;
-  top: 50%;
-  width: 12px; height: 12px;
-  margin-top: -6px;
-  color: var(--colorNeutralForeground3);
-  transition:
-    color var(--durationGentle) var(--curveEasyEase),
-    opacity var(--durationGentle) var(--curveEasyEase);
-}
-.theme-track-icon.sun { left: 7px; }
-.theme-track-icon.moon { right: 7px; }
-
-html[data-theme='light'] .theme-track-icon.sun,
-html[data-theme='dark'] .theme-track-icon.moon { color: var(--colorBrandForeground1); opacity: 1; }
-
-html[data-theme='light'] .theme-track-icon.moon,
-html[data-theme='dark'] .theme-track-icon.sun { opacity: 0.5; }
-
-.theme-knob {
-  position: absolute;
-  top: 50%;
+  top: 2px;
   left: 2px;
-  width: 18px; height: 18px;
-  margin-top: -9px;
+  width: var(--seg-w);
+  height: var(--seg-h);
   border-radius: var(--borderRadiusCircular);
-  background: var(--colorNeutralBackground1);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStrokeAccessible);
-  box-shadow: var(--shadow2);
-  transition:
-    transform var(--durationGentle) var(--curveEasyEaseMax),
-    background-color var(--durationGentle) var(--curveEasyEase),
-    border-color var(--durationGentle) var(--curveEasyEase);
-}
-
-.theme-switch[aria-checked='true'] .theme-knob { transform: translateX(26px); }
-
-.theme-switch[aria-checked='true'] {
   background: var(--colorCompoundBrandBackground);
-  border-color: var(--colorCompoundBrandStroke);
+  box-shadow: var(--shadow2Brand);
+  transition: transform var(--durationGentle) var(--curveEasyEaseMax);
 }
-.theme-switch[aria-checked='true'] .theme-knob {
-  background: var(--colorBrand160);
-  border-color: transparent;
+
+.theme-seg-btn {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: var(--seg-w);
+  height: var(--seg-h);
+  padding: 0;
+  border: 0;
+  border-radius: var(--borderRadiusCircular);
+  background: transparent;
+  color: var(--colorNeutralForeground3);
+  cursor: pointer;
+  transition: color var(--durationGentle) var(--curveEasyEase);
 }
+
+.theme-seg-btn:hover { color: var(--colorNeutralForeground1); }
+
+.theme-seg-btn svg { width: 13px; height: 13px; display: block; }
+
+/* 选中的那格压在品牌色块上，用最深的品牌色保证对比度 */
+.theme-seg-btn.on { color: var(--colorBrand160); }
 
 /* 页脚 */
 
@@ -905,70 +957,78 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
 }
 
 @media (max-width: 720px) {
-  :root { --wrapPadX: 20px; }
+  /* 顶栏占位：岛高 52 + 上下各 12 的间距，内容避让同步跟上 */
+  :root { --wrapPadX: 20px; --nav-h: 70px; }
 
-  /* 窄屏不要通栏底，整条就是右上角那颗按钮 */
+  /* 顶栏整条透明，视觉全部交给岛；上/左/右留一样的 12px */
   .navbar,
   .navbar.scrolled {
-    padding: var(--spacingMNudge) var(--wrapPadX) 0;
+    padding: var(--spacingM) var(--spacingM) 0;
     background: transparent;
     border-bottom-color: transparent;
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
 
-  /* 收起态：岛面让给按钮自己，看起来就是右上角一个胶囊按钮 */
+  /* 灵动岛：左 Logo 右展开图标，四边内距一律 5px
+     收起 = 999px 胶囊，展开 = 20px 圆角方块（切换不做补间，见下面 transition 的说明） */
   .island {
     max-width: none;
     padding: 5px;
-    border: var(--strokeWidthThin) solid transparent;
-    border-radius: 22px;
-    background: transparent;
-    box-shadow: none;
-    transition:
-      border-radius var(--durationSlower) var(--curveEasyEaseMax),
-      background-color var(--durationSlow) var(--curveDecelerateMid),
-      border-color var(--durationSlow) var(--curveDecelerateMid),
-      box-shadow var(--durationSlow) var(--curveDecelerateMid);
-  }
-
-  .island-row { height: auto; justify-content: flex-end; }
-
-  .island .brand,
-  .island-switch,
-  .nav-links { display: none; }
-
-  .island-btn {
-    display: grid;
-    width: 38px; height: 38px;
+    border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+    border-radius: 999px;
     background: var(--colorBackgroundAcrylic);
-    border-color: var(--colorNeutralStroke2);
     box-shadow: var(--shadow8);
     -webkit-backdrop-filter: var(--acrylicBlur);
     backdrop-filter: var(--acrylicBlur);
+    transition:
+      /* 圆角不做补间，只用一个延迟控制"什么时候切"：
+         收缩态 = 等面板完全收完（--durationSlower）再落回 999px 胶囊 */
+      border-radius 0s var(--durationSlower),
+      box-shadow var(--durationSlow) var(--curveDecelerateMid),
+      background-color var(--durationSlow) var(--curveDecelerateMid),
+      border-color var(--durationSlow) var(--curveDecelerateMid);
   }
 
-  /* 展开态：岛面回来、按钮褪成裸图标、品牌归位 */
+  .navbar.scrolled .island { box-shadow: var(--shadow16); }
+
+  /* 展开：圆角立刻切成 20px（把延迟也归零），阴影照旧过渡 */
   .navbar.open .island {
-    background: var(--colorBackgroundAcrylic);
-    border-color: var(--colorNeutralStroke2);
-    box-shadow: var(--shadow16);
-    -webkit-backdrop-filter: var(--acrylicBlur);
-    backdrop-filter: var(--acrylicBlur);
+    border-radius: 20px;
+    box-shadow: var(--shadow28);
+    transition:
+      border-radius 0s,
+      box-shadow var(--durationSlow) var(--curveDecelerateMid),
+      background-color var(--durationSlow) var(--curveDecelerateMid),
+      border-color var(--durationSlow) var(--curveDecelerateMid);
   }
 
-  .navbar.open .island-row { height: var(--nav-h); justify-content: space-between; padding-left: 9px; }
-  .navbar.open .island .brand { display: flex; }
+  /* 行内不再各留各的边距，左右对齐交给岛自己的 padding */
+  .island-row {
+    height: 40px;
+    padding: 0;
+    justify-content: space-between;
+  }
 
-  .navbar.open .island-btn {
+  /* 收起态也露 Logo（点它回首页），展开按钮留在最右 */
+  .island .brand { display: flex; }
+  .island-switch,
+  .nav-links { display: none; }
+
+  .brand-logo { height: 24px; }
+
+  /* 展开图标：不要按钮壳，就是一枚图标；hover 才给一点底色暗示可点 */
+  .island-btn {
+    display: grid;
+    width: 40px; height: 40px;
     background: transparent;
     border-color: transparent;
     box-shadow: none;
-    -webkit-backdrop-filter: none;
-    backdrop-filter: none;
   }
+  .island-btn:hover { background: var(--colorSubtleBackgroundHover); }
+  .island-btn:active { background: var(--colorSubtleBackgroundPressed); }
 
-  /* 面板从胶囊内部长出来 */
+  /* 面板从岛内部长出来 */
   .island-menu {
     display: grid;
     grid-template-rows: 0fr;
@@ -982,9 +1042,42 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
 
   .island-menu-clip { min-height: 0; overflow: hidden; }
 
-  .island-list { padding: var(--spacingS) var(--spacingS) 0; }
+  .island-list { padding: var(--spacingS) 0 0; gap: var(--spacingXS); }
 
-  .brand-logo { height: 30px; }
+  /* 条目错峰落下：展开时一个个到位，收起时一起走 */
+  .island-item {
+    padding: var(--spacingM) var(--spacingM);
+    border-radius: var(--borderRadiusLarge);
+    opacity: 0;
+    transform: translateY(-6px);
+    transition:
+      opacity var(--durationNormal) var(--curveDecelerateMid),
+      transform var(--durationGentle) var(--curveEasyEaseMax),
+      color var(--durationFast) var(--curveEasyEase),
+      background-color var(--durationFast) var(--curveEasyEase);
+  }
+
+  .navbar.open .island-item { opacity: 1; transform: none; }
+  .navbar.open .island-item:nth-child(1) { transition-delay: 60ms; }
+  .navbar.open .island-item:nth-child(2) { transition-delay: 110ms; }
+  .navbar.open .island-item:nth-child(3) { transition-delay: 160ms; }
+  .navbar.open .island-item:nth-child(4) { transition-delay: 210ms; }
+
+  /* 主题开关跟在条目后面收尾 */
+  .island-menu-foot {
+    opacity: 0;
+    transform: translateY(-4px);
+    padding: var(--spacingM) var(--spacingM) var(--spacingXS);
+    transition:
+      opacity var(--durationNormal) var(--curveDecelerateMid),
+      transform var(--durationGentle) var(--curveEasyEaseMax);
+  }
+
+  .navbar.open .island-menu-foot {
+    opacity: 1;
+    transform: none;
+    transition-delay: 240ms;
+  }
 
   /* 手机:左边两行文字，右边校徽 */
   .footer {
@@ -1004,15 +1097,28 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
   }
   .footer-school img { height: 18px; }
 
-  .wrap { padding: 40px var(--wrapPadX) 76px; }
+  /* 顶栏已经用 --nav-h 避让过，这里只补一点点呼吸，别再叠一大段留白 */
+  .wrap { padding: 20px var(--wrapPadX) 76px; }
   .player { right: var(--spacingL); padding: var(--spacingSNudge) var(--spacingMNudge) var(--spacingSNudge) var(--spacingSNudge); }
+
+  /* 菜单展开时音乐播放器让位：它固定在岛上方，不藏起来会压住导航条目 */
+  html:has(.navbar.open) .player {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px) scale(0.96);
+  }
 }
 
 @media (max-width: 560px) {
-  .theme-switch { width: 46px; height: 24px; }
-  .theme-knob { width: 16px; height: 16px; margin-top: -8px; }
-  .theme-switch[aria-checked='true'] .theme-knob { transform: translateX(22px); }
-  .theme-track-icon { display: none; }
+  /* 三段控件再收一格，菜单底栏刚好放得下 */
+  .theme-seg { --seg-w: 24px; --seg-h: 21px; }
+  .theme-seg-btn svg { width: 12px; height: 12px; }
+}
+
+/* 小屏兜底：两侧再收一点，上下留白同步压一档 */
+@media (max-width: 420px) {
+  :root { --wrapPadX: 16px; }
+  .wrap { padding: 16px var(--wrapPadX) 64px; }
 }
 
 /* 主题切换:圆形揭示（View Transitions） */

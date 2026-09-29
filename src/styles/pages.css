@@ -891,11 +891,31 @@ html[data-theme='dark'] .hero-title-ink {
 
 .join-slide { min-height: 148px; }
 
+/* 分页正文卡：Markdown 正文装在实色卡片里，和渠道卡同一套视觉语言 */
+.join-card {
+  padding: var(--spacingXXXL);
+  background: var(--colorNeutralBackground1);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadius2XLarge);
+  box-shadow: var(--shadow2);
+}
+
+/* 卡内 Markdown 收一档，别抢页面大标题的层级 */
+.join-card .md > *:first-child { margin-top: 0; }
+.join-card .md > *:last-child { margin-bottom: 0; }
+.join-card .md h1 {
+  margin: var(--spacingXXL) 0 var(--spacingM);
+  font-size: var(--fontSize600);
+  padding-bottom: var(--spacingS);
+}
+.join-card .md h2 { margin: var(--spacingXXL) 0 var(--spacingM); font-size: var(--fontSize500); }
+.join-card .md h3 { margin: var(--spacingXL) 0 var(--spacingS); font-size: var(--fontSize400); }
+
 .join-controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--spacingM);
+  gap: var(--spacingM) var(--spacingL);
   margin-top: var(--spacingXXL);
 }
 
@@ -916,11 +936,13 @@ html[data-theme='dark'] .hero-title-ink {
     box-shadow var(--durationGentle) var(--curveEasyEase);
 }
 
-.join-dots button:hover { background: var(--colorNeutralStrokeAccessible); }
+/* 注意：这里只能用 background-color。用 background 简写会把 background-clip
+   重置成 border-box，手机端撑触控区用的 content-box 裁剪就失效，圆点会糊成一坨 */
+.join-dots button:hover { background-color: var(--colorNeutralStrokeAccessible); }
 
 .join-dots button.on {
   width: 40px;
-  background: var(--colorCompoundBrandBackground);
+  background-color: var(--colorCompoundBrandBackground);
   box-shadow: var(--shadow2Brand);
 }
 
@@ -942,13 +964,6 @@ html[data-theme='dark'] .hero-title-ink {
   font-weight: var(--fontWeightSemibold);
   color: var(--colorBrandForeground1);
   opacity: 0.55;
-}
-
-.join-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--spacingM);
-  margin-top: var(--spacingXXL);
 }
 
 .deck-arrow {
@@ -988,6 +1003,14 @@ html[data-theme='dark'] .hero-title-ink {
   font-size: var(--fontSize200);
   color: var(--colorNeutralForeground3);
   letter-spacing: 0.06em;
+}
+
+/* 滑动提示：只有窄屏（触屏为主）才露出来 */
+.deck-hint {
+  display: none;
+  font-size: var(--fontSize100);
+  letter-spacing: 0.08em;
+  color: var(--colorNeutralForeground4);
 }
 
 .channel-grid {
@@ -1039,6 +1062,19 @@ html[data-theme='dark'] .hero-title-ink {
 
 .channel.linkable .channel-val { color: var(--colorBrandForeground1); font-weight: var(--fontWeightSemibold); }
 .channel.linkable:hover .channel-val { color: var(--colorBrandForegroundLinkHover); }
+
+/* 触屏没有 hover：去掉悬停位移（点完不会"浮"着），换成按下反馈 */
+@media (hover: none) {
+  .channel:hover {
+    transform: none;
+    border-color: var(--colorNeutralStroke2);
+    box-shadow: var(--shadow2);
+  }
+  .channel.linkable:active {
+    transform: scale(0.99);
+    border-color: var(--colorBrandStroke1);
+  }
+}
 
 /* 404 */
 
@@ -1102,12 +1138,60 @@ html[data-theme='dark'] .hero-title-ink {
   .notice-title { font-size: var(--fontSize400); }
 
   .doc-grid { grid-template-columns: 1fr; }
-  .toolbar { gap: var(--spacingS); }
-  .search { max-width: none; }
+  .toolbar { gap: var(--spacingS); margin-bottom: var(--spacingXL); }
+  /* 独占一行：flex-basis 给满，否则被 flex:1 压成半行、placeholder 被截断；
+     16px 起步则是为了让 iOS 聚焦输入框时不会自动放大页面 */
+  .search { flex: 1 1 100%; width: 100%; max-width: none; min-width: 0; height: 40px; font-size: 16px; }
   .channel-grid { grid-template-columns: 1fr; }
 
+  /* ---- 加入页：正文卡 + 翻页控件重排（触控优先） ---- */
+  .join-slide { min-height: 0; }
+  .join-card { padding: var(--spacingXL); border-radius: var(--borderRadiusXLarge); }
+
+  .join-controls {
+    display: grid;
+    grid-template-columns: 46px 1fr 46px;
+    align-items: center;
+    gap: var(--spacingM);
+    margin-top: var(--spacingXL);
+  }
+  .join-controls .deck-arrow { width: 46px; height: 46px; font-size: var(--fontSize500); }
+  .join-controls .deck-arrow:first-child { grid-column: 1; grid-row: 1; }
+  .join-controls .join-dots { grid-column: 2; grid-row: 1; flex-wrap: wrap; justify-content: center; }
+  .join-controls .deck-arrow:last-child { grid-column: 3; grid-row: 1; }
+  .deck-count { grid-column: 1 / -1; grid-row: 2; text-align: center; }
+  .deck-hint { grid-column: 1 / -1; grid-row: 3; display: block; text-align: center; }
+
+  /* 分页点：视觉还是 4px 细条，靠 padding + background-clip 把触控区撑到 30px 高 */
   .join-dots { gap: var(--spacingXS); }
-  .join-dots button { width: 18px; }
-  .join-dots button.on { width: 30px; }
+  .join-dots button {
+    height: 30px;
+    padding: 13px 0;
+    background-clip: content-box;
+    border-radius: 0px;
+  }
+  .join-dots button.on { width: 34px; box-shadow: none; }
+
+  .join-prompt { padding: var(--spacingXL); gap: var(--spacingM); }
+  .join-prompt-index { font-size: var(--fontSize700); }
+
   .notfound .back-link { margin-top: var(--spacingXXL); }
+}
+
+/* ≤560：正文卡与渠道卡再收一档，手机上一屏能多放内容 */
+@media (max-width: 560px) {
+  .join-card { padding: var(--spacingL); }
+  .channel-grid { gap: var(--spacingM); }
+  .channel { padding: var(--spacingL) var(--spacingXL); }
+}
+
+/* ≤420：小屏兜底，标题与控件尺寸不再挤压换行 */
+@media (max-width: 420px) {
+  .kicker { font-size: var(--fontSize100); letter-spacing: 0.12em; }
+  .page-title { font-size: var(--fontSize700); }
+  .page-desc { font-size: var(--fontSize300); line-height: var(--lineHeight300); }
+  .rule { margin: var(--spacingXXL) 0; }
+
+  .join-controls { grid-template-columns: 42px 1fr 42px; }
+  .join-controls .deck-arrow { width: 42px; height: 42px; font-size: var(--fontSize400); }
 }

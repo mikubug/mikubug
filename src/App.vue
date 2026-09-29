@@ -58,6 +58,29 @@ const onDocPointerDown = (e) => {
 /* 导航高亮:成果详情页也点亮「成果」 */
 const activePath = computed(() => (route.path.startsWith('/works') ? '/works' : route.path));
 
+/* 选中指示条：一颗会滑动的短条，跟着当前项走（比每项各自长一根更顺眼） */
+const navEl = ref(null);
+const ind = reactive({ left: 0, width: 18, on: false });
+
+const syncInd = () => {
+  const box = navEl.value;
+  const el = box && box.querySelector('.nav-link.active');
+  if (!box || !el || !el.offsetWidth) {
+    ind.on = false;
+    return;
+  }
+  // 指示条固定 18px 宽，居中挂在当前项下方
+  ind.width = 18;
+  ind.left = el.offsetLeft + (el.offsetWidth - 18) / 2;
+  ind.on = true;
+};
+
+let indRaf = 0;
+const queueSyncInd = () => {
+  cancelAnimationFrame(indRaf);
+  indRaf = requestAnimationFrame(syncInd);
+};
+
 /* Logo 是艺术字，明暗各一份，跟着主题换（手动切和跟随系统都会走到这里） */
 const brandLogo = computed(() => (theme.value === 'dark' ? SITE.logoDark : SITE.logo));
 
@@ -67,7 +90,10 @@ watch(
   () => {
     closeMenu();
     if (route.path !== '/join') music.hide();
-    nextTick(() => requestAnimationFrame(flushReveal));
+    nextTick(() => {
+      requestAnimationFrame(flushReveal);
+      queueSyncInd();
+    });
   }
 );
 
@@ -83,9 +109,14 @@ onMounted(() => {
 
   document.addEventListener('pointerdown', onDocPointerDown);
   window.addEventListener('keydown', onKey);
+  window.addEventListener('resize', queueSyncInd);
 
   // 首屏淡入
   requestAnimationFrame(() => { ready.value = true; });
+
+  // 指示条等字体/布局稳定后再定位，然后解锁滑入动画
+  nextTick(syncInd);
+  document.fonts?.ready.then(queueSyncInd);
 
   // 兜底:2 秒后强制显示仍未触发的进场元素,绝不让内容永不可见
   setTimeout(forceReveal, 2000);
@@ -95,6 +126,8 @@ onUnmounted(() => {
   window.removeEventListener('scroll', onScroll);
   document.removeEventListener('pointerdown', onDocPointerDown);
   window.removeEventListener('keydown', onKey);
+  window.removeEventListener('resize', queueSyncInd);
+  cancelAnimationFrame(indRaf);
 });
 </script>
 
@@ -114,7 +147,13 @@ onUnmounted(() => {
             <img class="brand-logo" :src="brandLogo" :alt="`${SITE.en} · ${SITE.cn}`" width="200" height="65" />
           </RouterLink>
 
-          <nav class="nav-links" aria-label="主导航">
+          <nav ref="navEl" class="nav-links" aria-label="主导航">
+            <!-- 当前项指示条：位置由 JS 算，切换路由时滑过去 -->
+            <span
+              class="nav-ind"
+              aria-hidden="true"
+              :style="{ left: `${ind.left}px`, width: `${ind.width}px`, opacity: ind.on ? 1 : 0 }"
+            ></span>
             <RouterLink
               v-for="n in NAV"
               :key="n.path"
@@ -161,7 +200,7 @@ onUnmounted(() => {
             </nav>
 
             <div class="island-menu-foot">
-              <span class="island-menu-key">明暗风格</span>
+              <span class="island-menu-key">外观模式</span>
               <ThemeToggle />
             </div>
           </div>

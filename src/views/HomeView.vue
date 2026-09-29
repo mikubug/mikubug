@@ -16,6 +16,8 @@ const ENTRIES = [
 
 const LINES = [
 
+  'Maker Intellengent Key Union',
+
   '探索前沿技术 汇聚创造力量',
 
   '从想法出发 把创意变成现实',
@@ -46,7 +48,7 @@ const LINES = [
 
   '少年意气，凌云而上',
 
-  '周南梅溪湖现在唯一 ACG 社！',
+  '周南梅溪湖现在唯一 "ACG" 社！',
 
   '周南梅溪湖中学凌云社！',
 
@@ -71,8 +73,6 @@ const LINES = [
   '把零件拼成一个世界',
 
   '实践是检验真理的唯一标准',
-  
-  '这里是科技社，也是 ACG 社',
 
   '让兴趣成为创造力',
 
@@ -252,7 +252,7 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="hero-content">
-          <p class="kicker">MikuBug</p>
+          <p class="kicker">MikuBug Studio</p>
           <h1 class="hero-title"><span ref="inkEl" class="hero-title-ink" :data-text="`${SITE.cn}.`">凌云社<span class="dot">.</span></span></h1>
           <p class="hero-sub">{{ SITE.tagline }}</p>
 

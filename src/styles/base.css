@@ -170,7 +170,7 @@ button { touch-action: manipulation; user-select: none; }
   backdrop-filter: var(--acrylicBlur);
 }
 
-/* 桌面端横向容器；窄屏下变成右上角那颗胶囊 */
+/* 顶栏横向容器；窄屏下去掉一切装饰，只留 Logo + 菜单按钮 */
 .island {
   position: relative;
   display: flex;
@@ -179,7 +179,7 @@ button { touch-action: manipulation; user-select: none; }
   max-width: var(--maxw);
   margin: 0 auto;
   padding: 0 var(--wrapPadX);
-  overflow: hidden;              /* 窄屏：让面板自内部展开 */
+  overflow: visible;             /* 菜单面板是挂在按钮下方的浮层，不能被裁掉 */
   animation: island-in var(--durationSlower) var(--curveEasyEaseMax) both;
 }
 
@@ -318,8 +318,9 @@ button { touch-action: manipulation; user-select: none; }
 
 .island-tools { display: flex; align-items: center; gap: var(--spacingL); }
 
+/* 菜单按钮：全宽度都在，所有导航都从它展开的面板进入 */
 .island-btn {
-  display: none;                 /* 桌面端不需要：导航项直接摊在岛面上 */
+  display: grid;
   width: 32px; height: 32px;
   place-items: center;
   padding: 0;
@@ -365,7 +366,43 @@ button { touch-action: manipulation; user-select: none; }
 
 /* 岛面第二行：窄屏下拉面板（桌面端不参与布局） */
 
-.island-menu { display: none; }
+/* 菜单按钮的下拉面板：全宽度可用，浮在顶栏上，不占据文档高度 */
+
+.island-menu {
+  display: block;
+  position: absolute;
+  top: calc(var(--nav-h) + var(--spacingS));
+  right: 0;
+  z-index: 5;
+  width: 300px;
+  padding: var(--spacingM);
+  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
+  border-radius: var(--borderRadiusXLarge);
+  background: var(--colorBackgroundAcrylic);
+  box-shadow: var(--shadow28);
+  -webkit-backdrop-filter: var(--acrylicBlur);
+  backdrop-filter: var(--acrylicBlur);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-8px) scale(0.97);
+  transform-origin: top right;
+  transition:
+    opacity var(--durationNormal) var(--curveDecelerateMid),
+    transform var(--durationGentle) var(--curveEasyEaseMax),
+    visibility 0s var(--durationNormal);
+}
+
+.island-menu.show {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: none;
+  transition:
+    opacity var(--durationNormal) var(--curveDecelerateMid),
+    transform var(--durationGentle) var(--curveEasyEaseMax),
+    visibility 0s;
+}
 
 .island-list { display: grid; gap: var(--spacingXXS); }
 
@@ -709,31 +746,6 @@ button { touch-action: manipulation; user-select: none; }
 }
 .footer a:hover { color: var(--colorBrandForegroundLinkHover); text-decoration: underline; }
 
-/* 校徽:图片是深字透明底，深色主题下反色成浅字，卡片底色也跟着明暗走 */
-.footer-school {
-  display: block;
-  padding: 3px var(--spacingS);
-  border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
-  border-radius: var(--borderRadiusMedium);
-  background: var(--colorNeutralBackground1);
-  transition:
-    border-color var(--durationNormal) var(--curveEasyEase),
-    box-shadow var(--durationNormal) var(--curveEasyEase),
-    transform var(--durationGentle) var(--curveEasyEaseMax);
-}
-
-/* 深色下反色 —— invert 管黑白，hue-rotate(180deg) 把被带偏的色相转回来，
-   这样只有白/黑互换，校徽本身的蓝不会变成橙 */
-html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg); }
-
-.footer-school:hover {
-  border-color: var(--colorBrandStroke1);
-  box-shadow: var(--shadow4);
-  transform: translateY(-1px);
-}
-
-.footer-school img { display: block; height: 22px; width: auto; }
-
 /* 状态 / 骨架屏 */
 
 .state {
@@ -954,11 +966,19 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
 
 @media (max-width: 860px) {
   .player-vol { display: none; }
+  /* 导航项收进菜单，顶栏只留 Logo + 菜单按钮 */
+  .nav-links { display: none; }
+  /* 顶栏贴边时，面板也要留出同样的内缩，别顶到屏幕边 */
+  .navbar,
+  .navbar.scrolled { padding: 0 var(--wrapPadX); }
 }
 
 @media (max-width: 720px) {
   /* 顶栏占位：岛高 52 + 上下各 12 的间距，内容避让同步跟上 */
   :root { --wrapPadX: 20px; --nav-h: 70px; }
+
+  /* 菜单按钮是悬浮圆钮，面板跟着收窄，别顶到屏幕边 */
+  .island-menu { width: min(280px, calc(100vw - 2 * var(--wrapPadX))); }
 
   /* 顶栏整条透明，视觉全部交给岛；上/左/右留一样的 12px */
   .navbar,
@@ -970,79 +990,59 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
     backdrop-filter: none;
   }
 
-  /* 灵动岛：左 Logo 右展开图标，四边内距一律 5px
-     收起 = 999px 胶囊，展开 = 20px 圆角方块（切换不做补间，见下面 transition 的说明） */
+  /* 不再有灵动岛：胶囊外形 / 磨砂底 / 阴影全部去掉，
+     窄屏顶栏只剩左 Logo + 右一颗悬浮菜单按钮，和桌面端同一套视觉语言 */
   .island {
     max-width: none;
-    padding: 5px;
-    border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
-    border-radius: 999px;
-    background: var(--colorBackgroundAcrylic);
-    box-shadow: var(--shadow8);
-    -webkit-backdrop-filter: var(--acrylicBlur);
-    backdrop-filter: var(--acrylicBlur);
-    transition:
-      /* 圆角不做补间，只用一个延迟控制"什么时候切"：
-         收缩态 = 等面板完全收完（--durationSlower）再落回 999px 胶囊 */
-      border-radius 0s var(--durationSlower),
-      box-shadow var(--durationSlow) var(--curveDecelerateMid),
-      background-color var(--durationSlow) var(--curveDecelerateMid),
-      border-color var(--durationSlow) var(--curveDecelerateMid);
-  }
-
-  .navbar.scrolled .island { box-shadow: var(--shadow16); }
-
-  /* 展开：圆角立刻切成 20px（把延迟也归零），阴影照旧过渡 */
-  .navbar.open .island {
-    border-radius: 20px;
-    box-shadow: var(--shadow28);
-    transition:
-      border-radius 0s,
-      box-shadow var(--durationSlow) var(--curveDecelerateMid),
-      background-color var(--durationSlow) var(--curveDecelerateMid),
-      border-color var(--durationSlow) var(--curveDecelerateMid);
-  }
-
-  /* 行内不再各留各的边距，左右对齐交给岛自己的 padding */
-  .island-row {
-    height: 40px;
     padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  /* 指针扫光属于岛面材质，一并去掉 */
+  .island::after { display: none; }
+
+  .island-row {
+    height: 52px;
+    padding: 0;
+    gap: var(--spacingM);
     justify-content: space-between;
   }
 
-  /* 收起态也露 Logo（点它回首页），展开按钮留在最右 */
+  /* 左 Logo（点它回首页），导航项不出现在行内，只从菜单里展开 */
   .island .brand { display: flex; }
   .island-switch,
   .nav-links { display: none; }
 
   .brand-logo { height: 24px; }
 
-  /* 展开图标：不要按钮壳，就是一枚图标；hover 才给一点底色暗示可点 */
+  /* 菜单按钮：独立悬浮圆钮，不再是岛的一部分 */
   .island-btn {
     display: grid;
     width: 40px; height: 40px;
-    background: transparent;
-    border-color: transparent;
-    box-shadow: none;
-  }
-  .island-btn:hover { background: var(--colorSubtleBackgroundHover); }
-  .island-btn:active { background: var(--colorSubtleBackgroundPressed); }
-
-  /* 面板从岛内部长出来 */
-  .island-menu {
-    display: grid;
-    grid-template-rows: 0fr;
-    opacity: 0;
+    border-color: var(--colorNeutralStroke2);
+    border-radius: var(--borderRadiusCircular);
+    background: var(--colorBackgroundAcrylic);
+    box-shadow: var(--shadow4);
+    -webkit-backdrop-filter: var(--acrylicBlur);
+    backdrop-filter: var(--acrylicBlur);
     transition:
-      grid-template-rows var(--durationSlower) var(--curveEasyEaseMax),
-      opacity var(--durationNormal) var(--curveDecelerateMid);
+      background-color var(--durationFast) var(--curveEasyEase),
+      border-color var(--durationFast) var(--curveEasyEase),
+      box-shadow var(--durationFast) var(--curveEasyEase),
+      transform var(--durationGentle) var(--curveEasyEaseMax);
   }
+  .island-btn:hover {
+    border-color: var(--colorBrandStroke1);
+    box-shadow: var(--shadow8);
+  }
+  .island-btn:active { background: var(--colorSubtleBackgroundPressed); transform: scale(0.96); }
 
-  .island-menu.show { grid-template-rows: 1fr; opacity: 1; }
-
-  .island-menu-clip { min-height: 0; overflow: hidden; }
-
-  .island-list { padding: var(--spacingS) 0 0; gap: var(--spacingXS); }
+  .island-list { gap: var(--spacingXS); }
 
   /* 条目错峰落下：展开时一个个到位，收起时一起走 */
   .island-item {
@@ -1079,29 +1079,19 @@ html[data-theme='dark'] .footer-school img { filter: invert(1) hue-rotate(180deg
     transition-delay: 240ms;
   }
 
-  /* 手机:左边两行文字，右边校徽 */
   .footer {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    column-gap: var(--spacingL);
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
     row-gap: 2px;
     padding: var(--spacingL) var(--wrapPadX) var(--spacingXXL);
   }
-  .footer > span:nth-child(1) { grid-area: 1 / 1; }
-  .footer > span:nth-child(2) { grid-area: 2 / 1; }
-  .footer-school {
-    grid-area: 1 / 2 / span 2 / span 1;
-    justify-self: end;
-    padding: 2px var(--spacingSNudge);
-  }
-  .footer-school img { height: 18px; }
 
   /* 顶栏已经用 --nav-h 避让过，这里只补一点点呼吸，别再叠一大段留白 */
   .wrap { padding: 20px var(--wrapPadX) 76px; }
   .player { right: var(--spacingL); padding: var(--spacingSNudge) var(--spacingMNudge) var(--spacingSNudge) var(--spacingSNudge); }
 
-  /* 菜单展开时音乐播放器让位：它固定在岛上方，不藏起来会压住导航条目 */
+  /* 菜单展开时音乐播放器让位：它固定在右上角，不藏起来会压住菜单面板 */
   html:has(.navbar.open) .player {
     opacity: 0;
     visibility: hidden;

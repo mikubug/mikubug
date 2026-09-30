@@ -41,7 +41,7 @@ router.afterEach(() => {
   }, 260);
 });
 
-/* 顶栏：桌面通栏横条，窄屏收成右上角一个按钮，点开向下展开 */
+/* 顶栏：宽屏摊开导航项，窄屏收起灵动岛只留 Logo + 菜单按钮；所有导航都能从菜单按钮的下拉面板进入 */
 
 const menuOpen = ref(false);
 
@@ -182,7 +182,7 @@ onUnmounted(() => {
           </div>
         </div>
 
-        <!-- 岛面第二行：窄屏下拉（桌面端隐藏） -->
+        <!-- 顶栏第二行：由菜单按钮展开的下拉面板（默认收起，窄屏才启用） -->
         <div id="island-menu" class="island-menu" :class="{ show: menuOpen }">
           <div class="island-menu-clip">
             <nav class="island-list" aria-label="导航">
@@ -221,16 +221,6 @@ onUnmounted(() => {
       <span>
         <a :href="SITE.github" target="_blank" rel="noopener noreferrer">github.com/mikubug</a>
       </span>
-      <!-- 原来放校名文字的位置，现在换成校徽，点开学校官网 -->
-      <a
-        class="footer-school"
-        :href="SITE.school"
-        target="_blank"
-        rel="noopener noreferrer"
-        title="长沙市周南梅溪湖中学"
-      >
-        <img :src="SITE.schoolLogo" alt="长沙市周南梅溪湖中学" />
-      </a>
     </footer>
   </div>
 

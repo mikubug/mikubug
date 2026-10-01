@@ -1,7 +1,14 @@
 <script setup>
-/** 首页 —— 主视觉（品牌光洗 + 细网格 + 双层轨道 + 终端打字机）+ 入口卡 */
-import { onBeforeUnmount, onMounted, ref } from 'vue';
+/**
+ * 首页 —— 像搜索引擎入口那样：中间一栏居中
+ * 凌云社（故障字）→ MikuBug Studio → 搜索框（打字机提示）＋尾部的两个图标入口
+ * 输入后回车，直接把关键词带进 /works 的搜索；下方是四个入口卡
+ */
+import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { SITE } from '../lib/site';
+
+const router = useRouter();
 
 const ENTRIES = [
   { path: '/notice', code: '01', en: 'NOTICE', label: '公告', desc: '社团通知与动态' },
@@ -10,9 +17,20 @@ const ENTRIES = [
   { path: '/join', code: '04', en: 'JOIN', label: '加入', desc: '成为我们的一员' },
 ];
 
-/* 终端打字机：打字 → 停留 → 整段清空 → 换行 */
+/* 搜索：输入 → 回车 → /works?q=关键词 */
 
-/** 每行用短句，太长会折行 */
+const q = ref('');
+const inputEl = ref(null);
+const focused = ref(false);
+
+const onSearch = () => {
+  const kw = q.value.trim();
+  router.push({ path: '/works', query: kw ? { q: kw } : {} });
+};
+
+/* 打字机提示：打字 → 停留 → 整段清空 → 换下一句
+   用独立的浮层元素画，输入框的 placeholder 只留无障碍文案；
+   用户一旦聚焦或输入就停播，把位置完全让给人 */
 
 const LINES = [
 
@@ -48,6 +66,12 @@ const LINES = [
 
   '少年意气，凌云而上',
 
+  '共同努力，探索未至之境',
+
+  '学校第一大科技社团！',
+
+  '你的下一个 ACG 社，何必是 ACG 社？',
+
   '这里，是我们的凌云社',
 
   '人民万岁！',
@@ -67,6 +91,8 @@ const LINES = [
   '把零件拼成一个世界',
 
   '实践是检验真理的唯一标准',
+  
+  '这里是科技社，也是 ACG 社',
 
   '让兴趣成为创造力',
 
@@ -77,32 +103,30 @@ const LINES = [
   '这个世界任你塑造。'
 
 ];
+
 const typed = ref('');
-
-/** 随机挑一句，且不和刚打完的重复 */
-const pickLine = (avoid) => {
-  let n = avoid;
-  while (n === avoid) n = Math.floor(Math.random() * LINES.length);
-  return n;
-};
-
-let line = Math.floor(Math.random() * LINES.length); // 每次进站开口也不一样
-let chars = 0;      // 已显示字符数
-let phase = 'type'; // type 打字 / hold 停留 / erase 清空
-let holdLeft = 0;   // 停留剩余帧
+let line = Math.floor(Math.random() * LINES.length);
+let chars = 0;
+let phase = 'type';
+let holdLeft = 0;
 let timer = 0;
 
-/** 按当前相位推进一格 */
+let paused = false;    // 聚焦等临时停播，可以恢复
+let dismissed = false; // 用户已经输入过内容，再也不自播
+
+/** 提示层是否显示：输入框空着、没聚焦、没被用户接管 */
+const showTyped = computed(() => !q.value && !focused.value && !dismissed.value);
+
 const step = () => {
+  if (paused || dismissed) return;
   const text = LINES[line];
 
   if (phase === 'type') {
     chars += 1;
     typed.value = text.slice(0, chars);
     if (chars >= text.length) {
-      // 打完停住约 2.2s，让人读完再清空
       phase = 'hold';
-      holdLeft = 11;
+      holdLeft = 11; // 打完停住约 2.2s
     }
     timer = setTimeout(step, chars === 1 ? 260 : 68); // 首字稍慢
     return;
@@ -118,52 +142,62 @@ const step = () => {
     return;
   }
 
-  // 整段清掉再换行，逐字回删太慢；下一句随机挑
+  // 整段清掉再换行；下一句随机挑，不和刚打完的重复
   typed.value = '';
   phase = 'type';
-  line = pickLine(line);
+  let n = line;
+  while (n === line) n = Math.floor(Math.random() * LINES.length);
+  line = n;
   chars = 0;
   timer = setTimeout(step, 380);
 };
 
-/* 指针视差：装饰层随指针轻微偏移 */
-
-const hero = ref(null);
-let raf = 0;
-let tx = 0, ty = 0, cx = 0, cy = 0;
-
-/** 缓动到目标点就停工，别一直空转（每帧写 CSS 变量会和标题渐变抢主线程） */
-const tick = () => {
-  cx += (tx - cx) * 0.09;
-  cy += (ty - cy) * 0.09;
-
-  if (Math.abs(tx - cx) < 0.08 && Math.abs(ty - cy) < 0.08) {
-    cx = tx;
-    cy = ty;
-    raf = 0;
-  } else {
-    raf = requestAnimationFrame(tick);
-  }
-
-  if (hero.value) {
-    hero.value.style.setProperty('--px', `${cx.toFixed(2)}px`);
-    hero.value.style.setProperty('--py', `${cy.toFixed(2)}px`);
-  }
+/** 暂停（聚焦时）：定住当前这句，别在光标旁边跳动 */
+const pauseTyping = () => {
+  if (dismissed) return;
+  paused = true;
+  clearTimeout(timer);
+  timer = 0;
 };
 
-/** 起步；已经在跑就不重复起 */
-const start = () => { if (!raf) raf = requestAnimationFrame(tick); };
-
-const onMove = (e) => {
-  const el = hero.value;
-  if (!el) return;
-  const r = el.getBoundingClientRect();
-  tx = ((e.clientX - r.left) / r.width - 0.5) * 16;
-  ty = ((e.clientY - r.top) / r.height - 0.5) * 12;
-  start();
+/** 恢复：重新起一轮，从当前这句的开头打 */
+const resumeTyping = () => {
+  if (dismissed || timer) return;
+  paused = false;
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    typed.value = LINES[line];
+    return;
+  }
+  chars = 0;
+  phase = 'type';
+  typed.value = '';
+  timer = setTimeout(step, 320);
 };
 
-const onLeave = () => { tx = 0; ty = 0; start(); };
+/** 用户输入过内容：永久停播 */
+const dismissTyping = () => {
+  dismissed = true;
+  paused = true;
+  clearTimeout(timer);
+  timer = 0;
+  typed.value = '';
+};
+
+const onFocus = () => {
+  focused.value = true;
+  pauseTyping();
+};
+
+const onBlur = () => {
+  focused.value = false;
+  resumeTyping();
+};
+
+/** 手输兜底：个别输入不经 v-model（如合成输入）也能同步并停播 */
+const onInput = (e) => {
+  q.value = e.target.value;
+  if (q.value) dismissTyping();
+};
 
 /* 标题故障闪：随机间隔抖一下，每次随机换一种形态，节奏不规律才像故障 */
 
@@ -200,19 +234,12 @@ onMounted(() => {
   const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (still) {
-    typed.value = LINES[line];
+    typed.value = LINES[line]; // 减少动态：只静态显示一句，不循环
+    dismissed = true;
   } else {
-    timer = setTimeout(step, 620);
+    timer = setTimeout(step, 520);
+    inkEl.value?.addEventListener('animationend', onFlickerEnd);
     scheduleFlicker();
-  }
-
-  inkEl.value?.addEventListener('animationend', onFlickerEnd);
-
-  // 只有带指针的设备才做视差，触屏省电
-  if (!still && window.matchMedia('(hover: hover)').matches) {
-    window.addEventListener('pointermove', onMove, { passive: true });
-    document.addEventListener('pointerleave', onLeave);
-    raf = requestAnimationFrame(tick);
   }
 });
 
@@ -220,68 +247,105 @@ onBeforeUnmount(() => {
   clearTimeout(timer);
   clearTimeout(flickerTimer);
   clearTimeout(offTimer);
-  cancelAnimationFrame(raf);
   inkEl.value?.removeEventListener('animationend', onFlickerEnd);
-  window.removeEventListener('pointermove', onMove);
-  document.removeEventListener('pointerleave', onLeave);
 });
 </script>
 
 <template>
-  <section class="page">
+  <section class="page page-home">
     <div class="wrap">
-      <!-- ---- 主视觉 ---- -->
-      <div ref="hero" class="hero">
-        <div class="hero-grid" aria-hidden="true"></div>
+      <div class="home-main">
+        <!-- 标题区：凌云社 / MikuBug Studio -->
+        <h1 class="home-title">
+          <span ref="inkEl" class="home-title-ink" :data-text="`${SITE.cn}.`">{{ SITE.cn }}<span class="dot">.</span></span>
+        </h1>
+        <p class="home-sub">MikuBug Studio</p>
 
-        <!-- 双层轨道：一层实线、一层虚线自转，中心一枚品牌光核 -->
-        <div class="hero-orbit" aria-hidden="true">
-          <span class="orbit-ring"></span>
-          <span class="orbit-ring inner"></span>
-          <span class="orbit-ring dashed"></span>
-          <span class="orbit-core"></span>
-          <span class="orbit-node n1"></span>
-          <span class="orbit-node n2"></span>
-          <span class="orbit-node n3"></span>
-        </div>
-
-        <div class="hero-content">
-          <p class="kicker">MikuBug Studio</p>
-          <h1 class="hero-title"><span ref="inkEl" class="hero-title-ink" :data-text="`${SITE.cn}.`">凌云社<span class="dot">.</span></span></h1>
-          <p class="hero-sub">{{ SITE.tagline }}</p>
-
-          <!-- 终端打字机：> 由 CSS 画，光标跟在文案后面 -->
-          <p class="hero-term">
-            <span class="hero-term-text">{{ typed }}</span>
-            <span class="hero-term-caret" aria-hidden="true"></span>
-          </p>
-
-          <div class="hero-actions">
-            <RouterLink class="btn btn-primary btn-lg" to="/join">加入我们</RouterLink>
-            <RouterLink class="btn btn-lg" to="/works">浏览成果</RouterLink>
-          </div>
-        </div>
-      </div>
-
-      <hr v-reveal class="rule" />
-
-      <!-- ---- 入口卡片 ---- -->
-      <div class="entry-grid">
-        <RouterLink
-          v-for="(e, i) in ENTRIES"
-          :key="e.path"
-          v-reveal="i * 90"
-          :to="e.path"
-          class="entry"
-        >
-          <span class="entry-code" aria-hidden="true">{{ e.code }}</span>
-          <span class="entry-body">
-            <span class="entry-label">{{ e.label }}</span>
-            <span class="entry-en">{{ e.en }}</span>
-            <span class="entry-desc">{{ e.desc }}</span>
+        <!-- 搜索框：打字机提示 + 尾部两个图标入口 -->
+        <form class="searchbar" role="search" @submit.prevent="onSearch">
+          <span class="searchbar-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.7" />
+              <path d="M15.4 15.4 20.5 20.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" />
+            </svg>
           </span>
-          <span class="entry-arrow" aria-hidden="true">→</span>
-        </RouterLink>
+
+          <span class="searchbar-field">
+            <input
+              ref="inputEl"
+              v-model="q"
+              class="searchbar-input"
+              type="search"
+              name="q"
+              autocomplete="off"
+              enterkeyhint="search"
+              placeholder="搜索标题、作者、标签…"
+              :aria-label="`搜索${SITE.cn}的成果`"
+              @focus="onFocus"
+              @blur="onBlur"
+              @input="onInput"
+            />
+            <!-- 打字机提示层：pointer-events 关掉，点它等于点输入框 -->
+            <span v-show="showTyped" class="searchbar-typed" aria-hidden="true">
+              <span class="searchbar-typed-text">{{ typed }}</span>
+              <span class="searchbar-caret"></span>
+            </span>
+          </span>
+
+          <div class="searchbar-actions">
+            <RouterLink class="searchbar-btn" to="/join" title="加入我们" aria-label="加入我们">
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <circle cx="9.5" cy="8" r="3.6" stroke="currentColor" stroke-width="1.6" />
+                <path d="M3.4 19.4c0-3.4 2.7-5.6 6.1-5.6s6.1 2.2 6.1 5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+                <path d="M18.4 4.6v5.6M15.6 7.4h5.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </RouterLink>
+
+            <RouterLink class="searchbar-btn" to="/works" title="浏览成果" aria-label="浏览成果">
+              <!-- 两张叠起来的纸：外层是"后面那张"的轮廓，内层是"前面那张"带文字的纸。
+                   刻意让两组线条互不相交，避免线压线显得糊成一团 -->
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="M6 6.4V5.5A1.9 1.9 0 0 1 7.9 3.6h6.3l4.4 4.4v9.6a1.9 1.9 0 0 1-1.9 1.9h-1.8"
+                  stroke="currentColor"
+                  stroke-width="1.6"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <rect x="3.6" y="8.6" width="10.4" height="11.8" rx="1.9" stroke="currentColor" stroke-width="1.6" />
+                <path d="M6.7 12.4h4.2M6.7 15.4h4.2M6.7 18.4h2.6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+              </svg>
+            </RouterLink>
+          </div>
+        </form>
+
+        <!-- 整句一个文本节点：拆成多段分别翻译会拼出病句，
+             所以链接放在句末单独一段，让主干是一整句 -->
+        <p class="home-hint">
+          <span>回车即在成果中搜索</span>
+          <RouterLink to="/works">浏览成果 →</RouterLink>
+        </p>
+
+        <hr class="rule home-rule" />
+
+        <!-- 四个入口卡 -->
+        <div class="entry-grid">
+          <RouterLink
+            v-for="(e, i) in ENTRIES"
+            :key="e.path"
+            v-reveal="i * 80"
+            :to="e.path"
+            class="entry"
+          >
+            <span class="entry-code" aria-hidden="true">{{ e.code }}</span>
+            <span class="entry-body">
+              <span class="entry-label">{{ e.label }}</span>
+              <span class="entry-en">{{ e.en }}</span>
+              <span class="entry-desc">{{ e.desc }}</span>
+            </span>
+            <span class="entry-arrow" aria-hidden="true">→</span>
+          </RouterLink>
+        </div>
       </div>
     </div>
   </section>

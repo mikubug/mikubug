@@ -259,11 +259,23 @@
   --fxSheen: linear-gradient(105deg, transparent 34%, rgba(102, 204, 255, 0.16), transparent 66%);
   --fxHairline: rgba(9, 151, 225, 0.16);
   --fxCursorGlow: radial-gradient(circle, rgba(102, 204, 255, 0.2), transparent 62%);
+  /* 标题故障闪的两片残影：一青一洋红，经典的色差分离 */
+  --glitchA: rgba(31, 174, 249, 0.95);
+  --glitchB: rgba(232, 62, 140, 0.9);
 
   /* 布局 */
   --nav-h: 64px;        /* 桌面顶栏高度，同时作为内容顶部避让高度 */
   --maxw: 1240px;
   --wrapPadX: 32px;
+
+  /* 指针视差偏移（由 App 的 rAF 缓动写入，背景装饰层读取） */
+  --px: 0px;
+  --py: 0px;
+
+  /* 首页留白预算：页脚高度与上下呼吸，用来算「顶栏下方到页脚上方」那一段高度。
+     左右内边距直接用 --wrapPadX，手机上加宽后卡片才不会贴边 */
+  --home-foot: 58px;
+  --home-pad: 28px;
 }
 
 /* 深色主题（Fluent 2 web dark theme） */
@@ -388,4 +400,7 @@ html[data-theme='dark'] {
   --fxSheen: linear-gradient(105deg, transparent 34%, rgba(102, 204, 255, 0.12), transparent 66%);
   --fxHairline: rgba(102, 204, 255, 0.14);
   --fxCursorGlow: radial-gradient(circle, rgba(102, 204, 255, 0.14), transparent 62%);
+  /* 深色下残影要更亮一点才看得出来 */
+  --glitchA: rgba(102, 204, 255, 0.95);
+  --glitchB: rgba(255, 92, 168, 0.9);
 }

@@ -48,6 +48,39 @@ const menuOpen = ref(false);
 const closeMenu = () => { menuOpen.value = false; };
 const toggleMenu = () => { menuOpen.value = !menuOpen.value; };
 
+/* 背景轨道：全站常驻在右下角，随指针轻微视差
+   用视口相对位移写到根元素上，和主视觉那套系数是同一套语义 */
+
+let parRaf = 0;
+let pTx = 0, pTy = 0, pCx = 0, pCy = 0;
+
+const parTick = () => {
+  pCx += (pTx - pCx) * 0.09;
+  pCy += (pTy - pCy) * 0.09;
+
+  if (Math.abs(pTx - pCx) < 0.08 && Math.abs(pTy - pCy) < 0.08) {
+    pCx = pTx;
+    pCy = pTy;
+    parRaf = 0;
+  } else {
+    parRaf = requestAnimationFrame(parTick);
+  }
+
+  const root = document.documentElement;
+  root.style.setProperty('--px', `${pCx.toFixed(2)}px`);
+  root.style.setProperty('--py', `${pCy.toFixed(2)}px`);
+};
+
+const parStart = () => { if (!parRaf) parRaf = requestAnimationFrame(parTick); };
+
+const onParMove = (e) => {
+  pTx = (e.clientX / window.innerWidth - 0.5) * 16;
+  pTy = (e.clientY / window.innerHeight - 0.5) * 12;
+  parStart();
+};
+
+const onParLeave = () => { pTx = 0; pTy = 0; parStart(); };
+
 /** 点岛外任意处收起 */
 const onDocPointerDown = (e) => {
   if (!menuOpen.value) return;
@@ -111,6 +144,12 @@ onMounted(() => {
   window.addEventListener('keydown', onKey);
   window.addEventListener('resize', queueSyncInd);
 
+  // 只有带指针的设备才做视差，触屏省电
+  if (window.matchMedia('(hover: hover)').matches) {
+    window.addEventListener('pointermove', onParMove, { passive: true });
+    document.addEventListener('pointerleave', onParLeave);
+  }
+
   // 首屏淡入
   requestAnimationFrame(() => { ready.value = true; });
 
@@ -127,13 +166,30 @@ onUnmounted(() => {
   document.removeEventListener('pointerdown', onDocPointerDown);
   window.removeEventListener('keydown', onKey);
   window.removeEventListener('resize', queueSyncInd);
+  window.removeEventListener('pointermove', onParMove);
+  document.removeEventListener('pointerleave', onParLeave);
   cancelAnimationFrame(indRaf);
+  cancelAnimationFrame(parRaf);
 });
 </script>
 
 <template>
   <FxBackground />
   <IntroScreen />
+
+  <!-- 右下角动态背景：品牌轨道环，全站常驻（不再只在首页）
+       外层吃指针视差，内层做自然浮动，两层各管一件事 -->
+  <div class="site-orbit" aria-hidden="true">
+    <div class="site-orbit-inner">
+      <span class="orbit-ring"></span>
+      <span class="orbit-ring inner"></span>
+      <span class="orbit-ring dashed"></span>
+      <span class="orbit-core"></span>
+      <span class="orbit-node n1"></span>
+      <span class="orbit-node n2"></span>
+      <span class="orbit-node n3"></span>
+    </div>
+  </div>
 
   <div class="shell" :class="{ ready }">
     <div class="progress" :class="{ on: bar.on }" :style="{ width: bar.width }"></div>

@@ -1,6 +1,7 @@
 <script setup>
 /** 成果页 —— 列出 repo/ 下的全部 Markdown 文档（构建期扫描，无需清单文件） */
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { DOCS, ALL_TAGS } from '../lib/content';
 import { fmtDate, fmtAuthors } from '../lib/format';
 
@@ -9,8 +10,32 @@ import StateBox from '../components/StateBox.vue';
 import TagChips from '../components/TagChips.vue';
 import MarkdownBlock from '../components/MarkdownBlock.vue';
 
-const keyword = ref('');
+const route = useRoute();
+
+const keyword = ref(typeof route.query.q === 'string' ? route.query.q : '');
 const activeTag = ref('');
+const searchEl = ref(null);
+
+/* 首页搜索框回车会带 ?q= 过来；之后若再带新关键词进来也要跟上 */
+watch(
+  () => route.query.q,
+  (v) => {
+    const next = typeof v === 'string' ? v : '';
+    if (next === keyword.value) return;
+    keyword.value = next;
+  }
+);
+
+/* 带关键词进来时把焦点落到搜索框，手机上可以接着改词；并滚到列表顶部 */
+watch(
+  () => route.query.q,
+  async (v) => {
+    if (!v) return;
+    await nextTick();
+    searchEl.value?.focus({ preventScroll: true });
+  },
+  { immediate: true }
+);
 
 /* 编号固定用文档在全量列表中的位置,筛选后不乱跳 */
 const indexed = DOCS.map((d, i) => ({ ...d, no: String(i + 1).padStart(2, '0') }));
@@ -37,6 +62,7 @@ const toggleTag = (t) => {
       <!-- 工具条:搜索 + 标签筛选 -->
       <div v-reveal class="toolbar">
         <input
+          ref="searchEl"
           v-model="keyword"
           class="search"
           type="search"

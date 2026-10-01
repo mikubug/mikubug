@@ -132,7 +132,9 @@ button { touch-action: manipulation; user-select: none; }
 }
 .shell.ready { opacity: 1; }
 
-.main { position: relative; flex: 1; padding-top: var(--nav-h); }
+/* 主内容区在页脚之前撑满剩余高度；做成纵向 flex，页面才能拿到
+   「顶栏下方到页脚上方」这段真实高度去居中（首页顶部导航到页脚之间的居中靠它） */
+.main { position: relative; flex: 1; display: flex; flex-direction: column; padding-top: var(--nav-h); }
 
 .page {
   min-height: calc(100vh - var(--nav-h));
@@ -320,7 +322,7 @@ button { touch-action: manipulation; user-select: none; }
 
 /* 菜单按钮：全宽度都在，所有导航都从它展开的面板进入 */
 .island-btn {
-  display: grid;
+  display: none;
   width: 32px; height: 32px;
   place-items: center;
   padding: 0;
@@ -366,7 +368,8 @@ button { touch-action: manipulation; user-select: none; }
 
 /* 岛面第二行：窄屏下拉面板（桌面端不参与布局） */
 
-/* 菜单按钮的下拉面板：全宽度可用，浮在顶栏上，不占据文档高度 */
+/* 菜单按钮的下拉面板：全宽度可用，浮在顶栏上，不占据文档高度。
+   实底不透明，半透明在这层会透出下面的文字，读起来很脏 */
 
 .island-menu {
   display: block;
@@ -378,10 +381,8 @@ button { touch-action: manipulation; user-select: none; }
   padding: var(--spacingM);
   border: var(--strokeWidthThin) solid var(--colorNeutralStroke2);
   border-radius: var(--borderRadiusXLarge);
-  background: var(--colorBackgroundAcrylic);
+  background: var(--colorNeutralBackground1);
   box-shadow: var(--shadow28);
-  -webkit-backdrop-filter: var(--acrylicBlur);
-  backdrop-filter: var(--acrylicBlur);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
@@ -968,17 +969,30 @@ button { touch-action: manipulation; user-select: none; }
   .player-vol { display: none; }
   /* 导航项收进菜单，顶栏只留 Logo + 菜单按钮 */
   .nav-links { display: none; }
-  /* 顶栏贴边时，面板也要留出同样的内缩，别顶到屏幕边 */
+  /* 顶栏与菜单面板共用同一道内缩：无安全区时就是 12px，
+     有刘海/圆角时自动让开，保证两者始终对齐 */
   .navbar,
-  .navbar.scrolled { padding: 0 var(--wrapPadX); }
+  .navbar.scrolled {
+    padding: 0
+      max(var(--spacingM), env(safe-area-inset-right, 0px))
+      0
+      max(var(--spacingM), env(safe-area-inset-left, 0px));
+  }
+  .island-menu {
+    right: 0;
+    width: min(
+      360px,
+      calc(100vw - max(var(--spacingM), env(safe-area-inset-left, 0px)) - max(var(--spacingM), env(safe-area-inset-right, 0px)))
+    );
+  }
 }
 
 @media (max-width: 720px) {
   /* 顶栏占位：岛高 52 + 上下各 12 的间距，内容避让同步跟上 */
   :root { --wrapPadX: 20px; --nav-h: 70px; }
 
-  /* 菜单按钮是悬浮圆钮，面板跟着收窄，别顶到屏幕边 */
-  .island-menu { width: min(280px, calc(100vw - 2 * var(--wrapPadX))); }
+  /* 手机上菜单直接占满可用宽度（与顶栏内缩对齐） */
+  .island-menu { width: auto; left: 0; }
 
   /* 顶栏整条透明，视觉全部交给岛；上/左/右留一样的 12px */
   .navbar,
@@ -1026,10 +1040,8 @@ button { touch-action: manipulation; user-select: none; }
     width: 40px; height: 40px;
     border-color: var(--colorNeutralStroke2);
     border-radius: var(--borderRadiusCircular);
-    background: var(--colorBackgroundAcrylic);
+    background: var(--colorNeutralBackground1);
     box-shadow: var(--shadow4);
-    -webkit-backdrop-filter: var(--acrylicBlur);
-    backdrop-filter: var(--acrylicBlur);
     transition:
       background-color var(--durationFast) var(--curveEasyEase),
       border-color var(--durationFast) var(--curveEasyEase),

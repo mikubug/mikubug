@@ -1,0 +1,96 @@
+writer:liyifan202201 & Catwam;tags=网站;url=https://github.com/mikubug/mikubug
+
+
+网址：<mikubug.top>
+
+### 介绍
+
+Vue 3 + Vite 的纯静态社团站（无后端），产物 dist/ 丢到任意静态托管即可。 英文名 MikuBug，中文名 凌云社 部署在 CloudFlare。
+
+面按 Fluent 2 组织，令牌集中在 src/styles/tokens.css
+
+### 部署命令
+
+```bash
+npm install
+npm run dev      # 开发
+npm run build    # 产出 dist/
+npm run preview  # 预览构建产物
+```
+
+### 结构
+
+```
+index.html              入口
+public/                 原样拷进 dist
+  notice.json5          公告数据（JSON5）
+  about.json5           关于页内容（可选）
+  join.json5            加入页文案与联系渠道
+  404.html              history 路由的静态托管回退页
+  _redirects            Cloudflare Pages 的回退规则
+  assets/               Logo 与音乐
+repo/*.md               成果文档
+src/
+  router/               路由表
+  lib/                  site / theme / content / json5 / md / format / player
+  components/           开场动画 / 背景 / 播放器 / 主题开关 / 通用块
+  directives/reveal.js  v-reveal 滚动进场
+  views/                首页 / 公告 / 成果 + 详情 / 关于 / 加入 / 404
+  styles/               tokens（Fluent 2 令牌）/ base / pages / markdown
+```
+
+
+### 内容维护
+
+
+**公告** —— 编辑 `public/notice.json5`：
+
+```json5
+// JSON5：能写注释、键名不用引号、允许尾随逗号，正文还可以直接换行
+[
+  {
+    title: '标题',
+    publisher: 'MikuBug',
+    date: '2026-09-16',
+    pinned: true,
+    tags: ['通知'],
+    body: '正文支持 **Markdown**。',
+  },
+]
+```
+
+**成果** —— 把 `.md` 丢进 `repo/` 就行，**文件名即标题**，构建期扫描内联，不需要任何清单文件。
+开头可写元信息（单行式或 `---` YAML 式都支持）：
+
+```
+writer:liyifan202201;tags=硬件/开发;url=https://example.com
+```
+
+列表展示正文前 100 字符的渲染摘要，点开看全文。
+
+**关于** —— 编辑 `public/about.json5` 的 `about` 字段，留空用占位内容。
+
+**加入** —— 编辑 `public/join.json5`：
+
+```json5
+{
+  slides: [
+    { kicker: '01 / WHY', title: '标题', desc: '副标题', detail: '卡片正文' },
+  ],
+  channels: [{ key: 'GITHUB', value: 'mikubug', href: 'https://github.com/mikubug' }],
+  join: '',   // 最后一页的 Markdown 正文，留空则用该页的 detail
+}
+```
+
+> 内容文件都用 **JSON5**（`public/*.json5`）：可以写注释、键名不用引号、允许尾随逗号；另外字符串里**可以直接换行**，长正文不必手敲转义。
+> 只有 `package.json` 保持标准 JSON（npm 要求）。
+
+## 路由
+
+| 路径 | 页面 |
+|---|---|
+| `/` | 首页 |
+| `/notice` | 公告 |
+| `/works` · `/works/<文件名>.md` | 成果 / 成果详情 |
+| `/about` · `/join` | 关于 / 加入 |
+
